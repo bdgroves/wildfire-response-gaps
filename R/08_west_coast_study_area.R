@@ -5,17 +5,22 @@
 # Depends on: 01_setup.R, 07_west_coast_setup.R
 # =============================================================================
 
+# Safety check - ensure dependencies are loaded
+if (!exists("target_crs")) {
+  message("Running dependency scripts first...")
+  source("R/01_setup.R")
+  source("R/07_west_coast_setup.R")
+}
+
 message("Loading West Coast county and state boundaries...")
 
-# County boundaries - all three states
-# map_dfr applies the function to each state and row-binds results
-westcoast_counties <- map_dfr(c("CA", "OR", "WA"), function(s) {
+westcoast_counties <- map(c("CA", "OR", "WA"), function(s) {
   counties(state = s, cb = TRUE) %>%
     st_transform(4326) %>%
     mutate(state_abbr = s)
-})
+}) %>%
+  list_rbind()
 
-# State boundaries
 westcoast_states <- states(cb = TRUE) %>%
   filter(STUSPS %in% c("CA", "OR", "WA")) %>%
   st_transform(4326)

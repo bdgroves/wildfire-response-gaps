@@ -287,3 +287,20 @@ wa_map <- build_state_map(
 )
 
 print(wa_map)
+
+# Copy CA and WA maps to output/figures/ so they show in README
+file.copy(
+  from = paste0(wc_output_dir, "california_coverage_",
+                format(Sys.Date(), "%Y%m%d"), ".png"),
+  to   = "output/figures/california_coverage.png",
+  overwrite = TRUE
+)
+
+file.copy(
+  from = paste0(wc_output_dir, "washington_coverage_",
+                format(Sys.Date(), "%Y%m%d"), ".png"),
+  to   = "output/figures/washington_coverage.png",
+  overwrite = TRUE
+)
+
+cat("Images copied to output/figures/\n")
