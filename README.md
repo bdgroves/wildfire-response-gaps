@@ -94,6 +94,30 @@ Oregon's eastern half and everything else is visible at a glance.
 
 ---
 
+## 2026 Fire Season — Live YTD Tracker
+
+This map rebuilds automatically from the NIFC WFIGS API each time the 
+script runs. During fire season it shows every current perimeter, 
+distance to nearest station, and adaptive stat panels that evolve as 
+the season progresses.
+
+![2026 YTD](output/figures/ytd_natgeo.png)
+
+**Adaptive panels by season stage:**
+
+| Stage | Fires | Sidebar panels |
+|-------|-------|----------------|
+| Early (<10) | Feb–May | Overview + Coverage + State Breakdown |
+| Building (10-49) | Jun | Overview + Coverage + Top 5 Stations |
+| Peak (50+) | Jul–Oct | Overview + Top 5 Stations + Worst 5 Counties |
+
+```r
+# One command to update during fire season:
+source("R/19_ytd_natgeo.R")
+```
+
+---
+
 ## Full Regional Summary
 
 | Region | Fires | Median Distance | % >50km | Key Finding |
@@ -120,11 +144,11 @@ Oregon's eastern half and everything else is visible at a glance.
 
 <table>
 <tr>
-<td><img src="output/figures/oregon_natgeo.png" width="400"/><br><em>NatGeo-style layout</em></td>
-<td><img src="output/figures/oregon_coverage_gap.png" width="400"/><br><em>Oregon coverage map</em></td>
+<td><img src="output/figures/oregon_natgeo.png" width="400"/><br><em>NatGeo-style Oregon layout</em></td>
+<td><img src="output/figures/ytd_natgeo.png" width="400"/><br><em>Live YTD tracker</em></td>
 </tr>
 <tr>
-<td><img src="output/figures/oregon_frenchglen_zoom.png" width="400"/><br><em>Frenchglen detail</em></td>
+<td><img src="output/figures/oregon_frenchglen_zoom.png" width="400"/><br><em>Frenchglen detail with range rings</em></td>
 <td><img src="output/figures/west_coast_combined.png" width="400"/><br><em>West Coast combined</em></td>
 </tr>
 </table>
@@ -143,6 +167,12 @@ Oregon's eastern half and everything else is visible at a glance.
 - CRS: UTM Zone 14N (EPSG 32614) for Texas, NAD83 Conus Albers 
   (EPSG 5070) for West Coast
 
+### Acreage
+- Historical fires: `attr_IncidentSize` from NIFC
+- YTD fires: `coalesce(attr_IncidentSize, poly_GISAcres)` — NIFC 
+  sometimes reports size as NA for new fires; GISAcres calculated 
+  from perimeter geometry is more reliable for early-season data
+
 ### Response Time Estimates
 - Straight-line distance × 1.3 road factor at 80 km/h
 - Standard rule of thumb for rural areas
@@ -150,8 +180,10 @@ Oregon's eastern half and everything else is visible at a glance.
   are likely significantly longer — treat as minimum estimates
 
 ### Fire Perimeters
-- **Final perimeters only** — daily snapshots excluded to avoid 
-  double-counting
+- **Final perimeters only** for historical analysis — daily snapshots 
+  excluded to avoid double-counting
+- **All perimeter types** for YTD — includes initial through final 
+  to capture active fires
 - Source: NIFC WFIGS Interagency Perimeters (all years + YTD)
 - Queried via REST API with state and bbox filters
 
@@ -192,12 +224,13 @@ R/
   10_west_coast_perimeters.R   NIFC paginated fetch with type fix
   11_west_coast_distance.R     Smart radius distance + RDS baseline
   12_west_coast_viz.R          Oregon hero map + comparison charts
-  13_west_coast_ytd.R          Current fire season YTD analysis
+  13_west_coast_ytd.R          Current fire season YTD data fetch
   14_state_maps.R              CA and WA coverage maps
   15_west_coast_combined_map.R All 3 states on one map
-  16_west_coast_ytd_maps.R     Live YTD maps (re-run during fire season)
+  16_west_coast_ytd_maps.R     YTD maps (standard ggplot style)
   17_oregon_deep_dive.R        Oregon story visuals for narrative
-  18_oregon_natgeo.R           NatGeo-style cartographic layout
+  18_oregon_natgeo.R           NatGeo-style Oregon layout
+  19_ytd_natgeo.R              NatGeo-style YTD live tracker
 
 output/
   figures/                     All saved PNGs for README + sharing
@@ -235,29 +268,27 @@ install.packages(c(
 ))
 ```
 
-### Run
+### Full pipeline
 ```r
-# Full pipeline
 source("R/00_run_all.R")
+```
 
-# Or individual scripts
-source("R/01_setup.R")
-source("R/07_west_coast_setup.R")
-# ... etc
-
-# Quick reload from saved baseline (skips API calls)
+### Quick reload from baseline
+```r
 source("R/01_setup.R")
 source("R/07_west_coast_setup.R")
 baseline <- readRDS("C:/data/Shapefiles/WestCoast/westcoast_baseline_YYYYMMDD.rds")
 list2env(baseline, envir = .GlobalEnv)
+```
 
-# NatGeo map from baseline (no API calls needed)
+### NatGeo Oregon map (no API calls needed)
+```r
 source("R/18_oregon_natgeo.R")
+```
 
-# Live YTD update during fire season
-source("R/10_west_coast_perimeters.R")  # needed for fetch function
-source("R/13_west_coast_ytd.R")
-source("R/16_west_coast_ytd_maps.R")
+### Live YTD update during fire season
+```r
+source("R/19_ytd_natgeo.R")
 ```
 
 ---
