@@ -7,7 +7,7 @@ spatial data science learning exercise uncovered a structural coverage gap
 in Oregon that is fundamentally different from its neighbors — and the 
 volunteer system that fills it.
 
-![Oregon's Wildfire Response Gap](output/figures/oregon_coverage_gap.png)
+![Oregon's Wildfire Response Gap — National Geographic Style](output/figures/oregon_natgeo.png)
 
 ---
 
@@ -46,6 +46,8 @@ organized to protect over **17.5 million acres** that have no existing state
 or local fire protection. This isn't informal mutual aid. It's codified in 
 Oregon statute with defined authority and structure.
 
+![Oregon Coverage Map](output/figures/oregon_coverage_gap.png)
+
 ---
 
 ## Frenchglen Fire Guard Station
@@ -83,6 +85,15 @@ half of the state.
 
 ---
 
+## West Coast Full Picture
+
+![West Coast Combined](output/figures/west_coast_combined.png)
+
+Three states, 3,635 fire perimeters, one map. The contrast between 
+Oregon's eastern half and everything else is visible at a glance.
+
+---
+
 ## Full Regional Summary
 
 | Region | Fires | Median Distance | % >50km | Key Finding |
@@ -102,6 +113,21 @@ half of the state.
 | Poor | 25–50 km | 582 | 16.0% |
 | Critical | 50–100 km | 232 | 6.4% |
 | Extreme | 100+ km | 171 | 4.7% |
+
+---
+
+## Sample Visualizations
+
+<table>
+<tr>
+<td><img src="output/figures/oregon_natgeo.png" width="400"/><br><em>NatGeo-style layout</em></td>
+<td><img src="output/figures/oregon_coverage_gap.png" width="400"/><br><em>Oregon coverage map</em></td>
+</tr>
+<tr>
+<td><img src="output/figures/oregon_frenchglen_zoom.png" width="400"/><br><em>Frenchglen detail</em></td>
+<td><img src="output/figures/west_coast_combined.png" width="400"/><br><em>West Coast combined</em></td>
+</tr>
+</table>
 
 ---
 
@@ -153,27 +179,28 @@ station location data alone.
 
 ```
 R/
-  00_run_all.R              Run everything in order
-  01_setup.R                Libraries and global settings
-  02_study_area.R           TX Panhandle county boundaries
-  03_fire_stations.R        OSM fire station fetch and clean
-  04_fire_perimeters.R      NIFC API fetch and clean
-  05_distance_analysis.R    Distance matrix and statistics
-  06_visualizations.R       TX Panhandle plots and maps
-  07_west_coast_setup.R     West Coast CRS, themes, output dir
-  08_west_coast_study_area.R  CA/OR/WA county boundaries
-  09_west_coast_stations.R  OSM stations with cache + retry
-  10_west_coast_perimeters.R  NIFC paginated fetch with type fix
-  11_west_coast_distance.R  Smart radius distance + RDS baseline
-  12_west_coast_viz.R       Oregon hero map + comparison charts
-  13_west_coast_ytd.R       Current fire season YTD analysis
-  14_state_maps.R           CA and WA coverage maps
-  15_west_coast_combined_map.R  All 3 states on one map
-  16_west_coast_ytd_maps.R  Live YTD maps (re-run during fire season)
-  17_oregon_deep_dive.R     Oregon story visuals for narrative
+  00_run_all.R                 Run everything in order
+  01_setup.R                   Libraries and global settings
+  02_study_area.R              TX Panhandle county boundaries
+  03_fire_stations.R           OSM fire station fetch and clean
+  04_fire_perimeters.R         NIFC API fetch and clean
+  05_distance_analysis.R       Distance matrix and statistics
+  06_visualizations.R          TX Panhandle plots and maps
+  07_west_coast_setup.R        West Coast CRS, themes, output dir
+  08_west_coast_study_area.R   CA/OR/WA county boundaries
+  09_west_coast_stations.R     OSM stations with cache + retry
+  10_west_coast_perimeters.R   NIFC paginated fetch with type fix
+  11_west_coast_distance.R     Smart radius distance + RDS baseline
+  12_west_coast_viz.R          Oregon hero map + comparison charts
+  13_west_coast_ytd.R          Current fire season YTD analysis
+  14_state_maps.R              CA and WA coverage maps
+  15_west_coast_combined_map.R All 3 states on one map
+  16_west_coast_ytd_maps.R     Live YTD maps (re-run during fire season)
+  17_oregon_deep_dive.R        Oregon story visuals for narrative
+  18_oregon_natgeo.R           NatGeo-style cartographic layout
 
 output/
-  figures/                  All saved PNGs for README + sharing
+  figures/                     All saved PNGs for README + sharing
 ```
 
 ---
@@ -219,10 +246,16 @@ source("R/07_west_coast_setup.R")
 # ... etc
 
 # Quick reload from saved baseline (skips API calls)
+source("R/01_setup.R")
+source("R/07_west_coast_setup.R")
 baseline <- readRDS("C:/data/Shapefiles/WestCoast/westcoast_baseline_YYYYMMDD.rds")
 list2env(baseline, envir = .GlobalEnv)
 
+# NatGeo map from baseline (no API calls needed)
+source("R/18_oregon_natgeo.R")
+
 # Live YTD update during fire season
+source("R/10_west_coast_perimeters.R")  # needed for fetch function
 source("R/13_west_coast_ytd.R")
 source("R/16_west_coast_ytd_maps.R")
 ```
