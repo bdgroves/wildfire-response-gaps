@@ -1,0 +1,93 @@
+# .github/workflows/ytd_update.yml
+# Daily YTD wildfire map update during fire season
+#
+# Runs at 6:00 AM Pacific (13:00 UTC) every day
+# Fetches fresh NIFC data, rebuilds NatGeo YTD map
+# Commits updated PNG to repo if changed
+#
+# To enable: push this file to your repo
+# To disable: comment out the schedule or delete the file
+
+name: Update YTD Wildfire Map
+
+on:
+  schedule:
+  # 6 AM Pacific = 1 PM UTC (after overnight fire updates post)
+  - cron: '0 13 * * *'
+
+# Allow manual trigger from GitHub Actions tab
+workflow_dispatch:
+  
+  jobs:
+  update-ytd:
+  runs-on: ubuntu-latest
+
+# Only run during fire season (March through November)
+# Remove this if you want year-round runs
+if: >
+  github.event_name == 'workflow_dispatch' || 
+  (github.event_name == 'schedule' && 
+     contains('3,4,5,6,7,8,9,10,11', format('{0}', github.event.schedule)))
+
+steps:
+  - name: Checkout repo
+uses: actions/checkout@v4
+
+- name: Setup R
+uses: r-lib/actions/setup-r@v2
+with:
+  r-version: '4.3.2'
+
+- name: Install system dependencies
+run: |
+  sudo apt-get update
+sudo apt-get install -y \
+libcurl4-openssl-dev \
+libssl-dev \
+libxml2-dev \
+libudunits2-dev \
+libgdal-dev \
+libgeos-dev \
+libproj-dev
+
+- name: Cache R packages
+uses: actions/cache@v4
+with:
+  path: ${{ env.R_LIBS_USER }}
+key: ${{ runner.os }}-r-${{ hashFiles('R/01_setup.R') }}
+restore-keys: |
+  ${{ runner.os }}-r-
+  
+  - name: Install R packages
+run: |
+  Rscript -e '
+            install.packages(c(
+              "sf", "tidyverse", "osmdata", "tigris", "httr",
+              "jsonlite", "ggrepel", "ggspatial", "cowplot",
+              "patchwork", "scales", "maps"
+            ), repos = "https://cloud.r-project.org")
+          '
+
+- name: Run YTD update
+run: |
+  Rscript R/update_ytd_ci.R
+
+- name: Check for changes
+id: check
+run: |
+  if git diff --quiet output/figures/ytd_natgeo.png; then
+echo "changed=false" >> $GITHUB_OUTPUT
+echo "No changes to YTD map"
+else
+  echo "changed=true" >> $GITHUB_OUTPUT
+echo "YTD map updated"
+fi
+
+- name: Commit and push
+if: steps.check.outputs.changed == 'true'
+run: |
+  git config user.name "github-actions[bot]"
+git config user.email "github-actions[bot]@users.noreply.github.com"
+git add output/figures/ytd_natgeo.png
+git commit -m "🔥 YTD map update $(date +'%Y-%m-%d') - $(Rscript -e 'cat(readLines(\"output/ytd_summary.txt\"))')"
+git push
