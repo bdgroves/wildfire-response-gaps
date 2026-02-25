@@ -34,7 +34,14 @@ jobs:
             libudunits2-dev \
             libgdal-dev \
             libgeos-dev \
-            libproj-dev
+            libproj-dev \
+            libfontconfig1-dev \
+            libharfbuzz-dev \
+            libfribidi-dev \
+            libfreetype6-dev \
+            libpng-dev \
+            libtiff5-dev \
+            libjpeg-dev
 
       - name: Install R packages
         run: |
@@ -51,7 +58,10 @@ jobs:
             "cowplot",
             "patchwork",
             "scales",
-            "maps"
+            "maps",
+            "systemfonts",
+            "textshaping",
+            "ragg"
           ))
         shell: Rscript {0}
 
@@ -61,7 +71,8 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet output/figures/ytd_natgeo.png; then
+          git add output/figures/ytd_natgeo.png output/ytd_summary.txt
+          if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes to YTD map"
           else
@@ -74,7 +85,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/figures/ytd_natgeo.png
-          git add output/ytd_summary.txt
           git commit -m "YTD map update $(date +'%Y-%m-%d')"
           git push
