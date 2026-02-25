@@ -1,5 +1,13 @@
 # 🔥 Wildfire Response Gap Analysis
 
+# 🔥 Wildfire Response Gap Analysis
+
+![Last Updated](https://img.shields.io/github/last-commit/bdgroves/wildfire-response-gaps?label=Last%20Updated&style=flat-square)
+![YTD Status](https://img.shields.io/badge/2026%20YTD-Live%20Tracker-orange?style=flat-square)
+![R](https://img.shields.io/badge/Built%20With-R%20%2B%20sf%20%2B%20ggplot2-blue?style=flat-square)
+
+**How far is the nearest fire station when a wildfire breaks out?**
+
 **How far is the nearest fire station when a wildfire breaks out?**
 
 A portfolio project built in R using open federal data. What started as a 
