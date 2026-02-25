@@ -1,0 +1,2 @@
+output/figures/*.png merge=ours
+output/*.txt merge=ours
