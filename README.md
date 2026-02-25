@@ -6,8 +6,6 @@
 
 **How far is the nearest fire station when a wildfire breaks out?**
 
-**How far is the nearest fire station when a wildfire breaks out?**
-
 A portfolio project built in R using open federal data. What started as a 
 spatial data science learning exercise uncovered a structural coverage gap 
 in Oregon that is fundamentally different from its neighbors — and the 
