@@ -46,6 +46,7 @@ jobs:
       - name: Install R packages
         run: |
           install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable/")
+          pak::pak("slowkow/ggrepel@0.9.6")
           pak::pak(c(
             "sf",
             "tidyverse",
@@ -53,7 +54,6 @@ jobs:
             "tigris",
             "httr",
             "jsonlite",
-            "ggrepel",
             "ggspatial",
             "cowplot",
             "patchwork",
