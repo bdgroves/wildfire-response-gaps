@@ -29,7 +29,7 @@ import requests
 # =============================================================================
 WFIGS_PERIMETERS = (
     "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/"
-    "CY_WildlandFire_Perimeters_ToDate/FeatureServer/0/query"
+    "WFIGS_Interagency_Perimeters_YTD/FeatureServer/0/query"
 )
 
 WFIGS_INCIDENTS = (
