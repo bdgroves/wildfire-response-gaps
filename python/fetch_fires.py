@@ -28,8 +28,8 @@ import requests
 # WFIGS API — same endpoints your R pipeline uses
 # =============================================================================
 WFIGS_PERIMETERS = (
-    "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/"
-    "WFIGS_Interagency_Perimeters_YTD/FeatureServer/0/query"
+    "https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/"
+    "WFIGS_Interagency_Perimeters_YearToDate/FeatureServer/0/query"
 )
 
 WFIGS_INCIDENTS = (
