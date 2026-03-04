@@ -164,7 +164,6 @@
     background: rgba(61,43,31,0.15);
   }
 
-  /* Stat grid */
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   .stat-box {
@@ -194,7 +193,6 @@
     line-height: 1.3;
   }
 
-  /* Coverage bar */
   .coverage-bar-wrap { margin: 10px 0 4px; }
 
   .bar-label-row {
@@ -216,7 +214,6 @@
     width: 0%;
   }
 
-  /* State rows */
   .state-row {
     display: flex;
     align-items: center;
@@ -247,7 +244,6 @@
     flex-shrink: 0;
   }
 
-  /* Legend */
   .legend-items { display: flex; flex-direction: column; gap: 7px; }
 
   .legend-item {
@@ -258,17 +254,10 @@
     color: var(--ink-brown);
   }
 
-  .legend-swatch {
-    width: 18px;
-    height: 12px;
-    border-radius: 1px;
-    flex-shrink: 0;
-  }
-
+  .legend-swatch { width: 18px; height: 12px; border-radius: 1px; flex-shrink: 0; }
   .swatch-active    { background: rgba(139,26,26,0.5); border: 1.5px solid #8B1A1A; }
   .swatch-contained { background: rgba(91,126,94,0.35); border: 1.5px solid var(--cont-dark); }
 
-  /* Error box */
   #error-box {
     display: none;
     margin: 10px 16px;
@@ -281,7 +270,6 @@
     line-height: 1.5;
   }
 
-  /* Timestamp */
   .timestamp {
     padding: 10px 16px;
     font-family: 'Source Code Pro', monospace;
@@ -293,11 +281,9 @@
     line-height: 1.5;
   }
 
-  /* ── MAP ── */
   #map-container { flex: 1; position: relative; overflow: hidden; }
   #map { width: 100%; height: 100%; }
 
-  /* Leaflet dark-ish overrides to match parchment theme */
   .leaflet-container { background: #c8b99a !important; }
 
   .leaflet-control-zoom a {
@@ -314,7 +300,6 @@
   }
   .leaflet-control-attribution a { color: var(--ink-brown) !important; }
 
-  /* Popups */
   .leaflet-popup-content-wrapper {
     background: var(--parchment) !important;
     border: 1px solid rgba(61,43,31,0.3) !important;
@@ -359,7 +344,6 @@
   .badge-active    { background: rgba(139,26,26,0.1); color: #8B1A1A; border: 1px solid #8B1A1A; }
   .badge-contained { background: rgba(91,126,94,0.1); color: var(--cont-dark); border: 1px solid var(--cont-dark); }
 
-  /* Map overlay */
   #map-overlay {
     position: absolute;
     top: 14px;
@@ -389,7 +373,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* Layer toggles */
   #layer-toggle {
     position: absolute;
     bottom: 32px;
@@ -416,7 +399,6 @@
   .toggle-btn:hover { background: var(--parch-dk); color: var(--ink-brown); }
   .toggle-btn.active { border-color: var(--ink-brown); color: var(--ink-brown); font-weight: 600; }
 
-  /* Loading */
   #loading {
     position: absolute;
     inset: 0;
@@ -452,7 +434,6 @@
     100% { width: 95%; }
   }
 
-  /* Caption bar */
   #caption {
     background: var(--parch-dk);
     border-top: 1px solid rgba(61,43,31,0.2);
@@ -469,7 +450,6 @@
 </head>
 <body>
 
-<!-- HEADER (NatGeo yellow bar) -->
 <header id="header">
   <h1>🔥 2026 WEST COAST WILDFIRE SEASON — YEAR TO DATE</h1>
   <div class="header-stats">
@@ -494,15 +474,12 @@
   </div>
 </header>
 
-<!-- SUBTITLE -->
-<div id="subtitle" id="subtitle-bar">
-  <span id="subtitle-text">Fetching live data from NIFC WFIGS…</span>
+<div id="subtitle">
+  <span id="subtitle-text">Loading fire data…</span>
 </div>
 
-<!-- MAIN -->
 <div id="main">
 
-  <!-- SIDEBAR -->
   <aside id="sidebar">
 
     <div class="sidebar-panel">
@@ -607,21 +584,20 @@
     <div class="sidebar-panel">
       <div class="panel-title">About</div>
       <div style="font-size:10px; color:var(--ink-gray); line-height:1.6;">
-        Fire perimeters from <strong style="color:var(--ink-brown)">NIFC WFIGS API</strong>. Stations from OpenStreetMap. Updated daily at 6am Pacific via GitHub Actions.<br><br>
+        Fire perimeters from <strong style="color:var(--ink-brown)">NIFC WFIGS</strong>, exported daily by GitHub Actions. Stations from OpenStreetMap. Updated at 6am Pacific.<br><br>
         Analysis by <strong style="color:var(--ink-brown)">B. Groves</strong> · <a href="https://github.com/bdgroves/wildfire-response-gaps" target="_blank" style="color:#8B1A1A;">wildfire-response-gaps</a>
       </div>
     </div>
 
     <div id="error-box"></div>
 
-    <div class="timestamp" id="timestamp">FETCHING LIVE DATA…</div>
+    <div class="timestamp" id="timestamp">LOADING…</div>
   </aside>
 
-  <!-- MAP -->
   <div id="map-container">
     <div id="loading">
       <div style="font-size:42px;">🔥</div>
-      <div class="loading-text">Fetching fire perimeters from WFIGS…</div>
+      <div class="loading-text">Loading fire perimeters…</div>
       <div class="loading-bar"><div class="loading-progress"></div></div>
     </div>
 
@@ -641,55 +617,22 @@
 
 </div>
 
-<!-- CAPTION BAR -->
 <div id="caption">
   <span id="caption-text">DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations · Straight-line distances · Analysis by B. Groves</span>
 </div>
 
 <script>
 // =============================================================================
-// CONFIGURATION
+// DATA SOURCE
+// fires.geojson is written by update_ytd_ci.R via sf::st_write() and committed
+// by GitHub Actions alongside ytd_natgeo.png each morning.
+// Same origin as this page — no CORS issues.
+// Fields from R: acres, is_active, status, state, dist_nearest_km,
+//                nearest_station_name, attr_IncidentName, attr_PercentContained
 // =============================================================================
+const GEOJSON_URL = './output/fires.geojson';
 
-// Esri Living Atlas — USA Wildfires v1
-// Layer 0: Current_Incidents (points) — IncidentName, DailyAcres, PercentContained, POOState
-// Layer 1: Current_Perimeters (polygons) — GISAcres, PercentContained, POOState, IncidentName
-const WFIGS_BASE = "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer";
-
-// Perimeters layer — matches your R pipeline's poly_ prefixed fields
-const PERIMETERS_URL = `${WFIGS_BASE}/1/query?` + new URLSearchParams({
-  where: "1=1",
-  outFields: "IncidentName,GISAcres,PercentContained,POOState,CreateDate,DateCurrent,FeatureCategory,FireDiscoveryDateTime",
-  geometry: "-124.8,32.5,-114.0,49.0",
-  geometryType: "esriGeometryEnvelope",
-  inSR: "4326",
-  spatialRel: "esriSpatialRelIntersects",
-  outSR: "4326",
-  f: "geojson",
-  resultRecordCount: "500"
-});
-
-// Incidents layer — for acreage fallback (matches attr_IncidentSize in your R code)
-const INCIDENTS_URL = `${WFIGS_BASE}/0/query?` + new URLSearchParams({
-  where: "1=1",
-  outFields: "IncidentName,DailyAcres,IncidentSize,PercentContained,POOState,UniqueFireIdentifier",
-  geometry: "-124.8,32.5,-114.0,49.0",
-  geometryType: "esriGeometryEnvelope",
-  inSR: "4326",
-  spatialRel: "esriSpatialRelIntersects",
-  outSR: "4326",
-  f: "geojson",
-  resultRecordCount: "500"
-});
-
-// Historical baselines from your R analysis
-const HIST = {
-  OR: { medianKm: 26.7, pctOver50: 30.1, color: "#8B1A1A" },
-  CA: { medianKm: 10.8, pctOver50: 1.5,  color: "#E67E22" },
-  WA: { medianKm: 8.6,  pctOver50: 1.9,  color: "#5C5C5C" }
-};
-
-// Key fire stations (curated — mirrors your R all_stations_wc_clean)
+// Key fire stations — mirrors your R all_stations_wc_clean
 const STATIONS = [
   { name: "Frenchglen Fire Guard Station", lat: 42.814, lon: -118.934 },
   { name: "Burns Interagency Fire Zone",   lat: 43.587, lon: -119.054 },
@@ -718,13 +661,11 @@ const map = L.map('map', {
   attributionControl: true
 });
 
-// Esri World Topo — matches the parchment aesthetic of your NatGeo R maps
 L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
   { attribution: '&copy; Esri, USGS, NOAA', maxZoom: 19, opacity: 0.9 }
 ).addTo(map);
 
-// Layer groups
 const fireLayers    = L.layerGroup().addTo(map);
 const stationLayers = L.layerGroup().addTo(map);
 const gapLayers     = L.layerGroup().addTo(map);
@@ -770,7 +711,7 @@ STATIONS.forEach(s => {
 });
 
 // =============================================================================
-// HAVERSINE — matches your R dist_nearest_km straight-line logic
+// HELPERS
 // =============================================================================
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371, toRad = d => d * Math.PI / 180;
@@ -789,7 +730,6 @@ function nearestStation(lat, lon) {
   return { station: best, distKm: bestDist };
 }
 
-// geometry centroid
 function centroid(geometry) {
   const pts = [];
   function collect(arr) {
@@ -797,9 +737,10 @@ function centroid(geometry) {
     arr.forEach(collect);
   }
   collect(geometry.coordinates);
-  const lat = pts.reduce((s,p) => s + p[1], 0) / pts.length;
-  const lon = pts.reduce((s,p) => s + p[0], 0) / pts.length;
-  return [lat, lon];
+  return [
+    pts.reduce((s,p) => s + p[1], 0) / pts.length,
+    pts.reduce((s,p) => s + p[0], 0) / pts.length
+  ];
 }
 
 function fmtAcres(x) {
@@ -808,39 +749,28 @@ function fmtAcres(x) {
   return Math.round(x).toLocaleString();
 }
 
-function fmtState(code) {
-  // matches your R case_when for attr_POOState
-  const m = { 'US-OR':'Oregon','US-CA':'California','US-WA':'Washington',
-               'US_OR':'Oregon','US_CA':'California','US_WA':'Washington',
-               'OR':'Oregon','CA':'California','WA':'Washington' };
-  return m[code] || code || '—';
-}
-
 // =============================================================================
-// PROCESS FIRE DATA
-// matches your R pipeline:
-//   acres = coalesce(na_if(attr_IncidentSize, 0), poly_GISAcres, 0)
-//   is_active = is.na(attr_PercentContained) | attr_PercentContained < 100
+// PROCESS GEOJSON
+// R writes these fields directly into fires.geojson:
+//   acres, is_active, status, state, dist_nearest_km, nearest_station_name,
+//   attr_IncidentName, attr_PercentContained
 // =============================================================================
-function processFeatures(geojson, incidentSizeMap) {
+function processFeatures(geojson) {
   fireLayers.clearLayers();
   gapLayers.clearLayers();
   labelLayers.clearLayers();
 
   const features = geojson.features || [];
+
   if (features.length === 0) {
-    showError("No fire perimeters returned. This is expected early in the season (Feb–May) when few fires have mapped perimeters.");
+    showError("No fire perimeters in fires.geojson. This is expected early in the season (Feb–May) before fires have mapped perimeters.");
     hideLoading();
-    updateHeader(0, 0, 0, 0, 0, 0);
+    updateHeader(0, 0, 0, 0);
     return;
   }
 
-  // Sort by acres desc for labeling (mirrors your arrange(desc(acres)))
-  features.sort((a, b) => {
-    const aA = bestAcres(a.properties, incidentSizeMap);
-    const bA = bestAcres(b.properties, incidentSizeMap);
-    return bA - aA;
-  });
+  // Sort by acres desc — mirrors R arrange(desc(acres))
+  features.sort((a, b) => (b.properties.acres || 0) - (a.properties.acres || 0));
 
   let totalAcres = 0, activeCount = 0, containedCount = 0;
   const distances = [];
@@ -849,31 +779,33 @@ function processFeatures(geojson, incidentSizeMap) {
   features.forEach((f, idx) => {
     const p = f.properties;
 
-    // Acreage: coalesce(IncidentSize, GISAcres, 0) — mirrors R pipeline
-    const acres = bestAcres(p, incidentSizeMap);
-
-    // Active logic: is.na(PercentContained) | PercentContained < 100
-    const pct = p.PercentContained;
-    const isActive = (pct === null || pct === undefined || pct < 100);
-
-    const stateName = fmtState(p.POOState);
+    // Fields written directly by R — use them as-is
+    const acres    = p.acres || 0;
+    const isActive = p.is_active === true || p.is_active === "TRUE";
+    const state    = p.state || '—';
+    const incName  = p.attr_IncidentName || 'Unknown Fire';
+    const pct      = p.attr_PercentContained;
 
     totalAcres += acres;
     if (isActive) activeCount++; else containedCount++;
 
-    // Centroid for distance calculation
+    // Centroid for gap lines and labels
     let cLat, cLon;
-    try {
-      [cLat, cLon] = centroid(f.geometry);
-    } catch(e) { return; }
+    try { [cLat, cLon] = centroid(f.geometry); } catch(e) { return; }
 
-    const { station, distKm } = nearestStation(cLat, cLon);
-    distances.push(distKm);
-    if (distKm > 50) over50++;
+    // Use R-computed distance when available, fall back to browser haversine
+    let finalDist = p.dist_nearest_km || null;
+    let finalStn  = p.nearest_station_name || null;
+    if (!finalDist) {
+      const { station, distKm } = nearestStation(cLat, cLon);
+      finalDist = distKm;
+      finalStn  = station ? station.name : null;
+    }
 
-    // Response time estimate (~1.07 min/km at road speed, rough)
-    const respMin = Math.round(distKm * 1.07);
+    distances.push(finalDist);
+    if (finalDist > 50) over50++;
 
+    const respMin    = Math.round(finalDist * 1.07);
     const fillColor  = isActive ? 'rgba(139,26,26,0.45)' : 'rgba(91,126,94,0.35)';
     const lineColor  = isActive ? '#8B1A1A' : '#3D5C3F';
     const lineWeight = isActive ? 1.5 : 1;
@@ -881,30 +813,18 @@ function processFeatures(geojson, incidentSizeMap) {
     let poly;
     try {
       poly = L.geoJSON(f, {
-        style: {
-          color: lineColor,
-          fillColor,
-          weight: lineWeight,
-          fillOpacity: 1,
-          opacity: 0.9
-        }
+        style: { color: lineColor, fillColor, weight: lineWeight, fillOpacity: 1, opacity: 0.9 }
       });
     } catch(e) { return; }
-
-    const incName = p.IncidentName || 'Unknown Fire';
-    const dateStr = p.DateCurrent
-      ? new Date(p.DateCurrent).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
-      : (p.CreateDate ? new Date(p.CreateDate).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '—');
 
     poly.bindPopup(`<div class="fire-popup">
       <h3>${incName}</h3>
       <table>
         <tr><td>Acres</td><td>${acres > 0 ? acres.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'}</td></tr>
-        <tr><td>State</td><td>${stateName}</td></tr>
+        <tr><td>State</td><td>${state}</td></tr>
         <tr><td>% Contained</td><td>${pct !== null && pct !== undefined ? pct + '%' : 'Unknown'}</td></tr>
-        <tr><td>Updated</td><td>${dateStr}</td></tr>
-        <tr><td>Nearest station</td><td>${station ? station.name.split(' ').slice(0,3).join(' ') : '—'}</td></tr>
-        <tr><td>Distance (straight-line)</td><td>${distKm.toFixed(1)} km</td></tr>
+        <tr><td>Nearest station</td><td>${finalStn ? finalStn.split(' ').slice(0,3).join(' ') : '—'}</td></tr>
+        <tr><td>Distance (straight-line)</td><td>${finalDist.toFixed(1)} km</td></tr>
         <tr><td>Est. response time</td><td>~${respMin} min</td></tr>
       </table>
       <span class="popup-badge ${isActive ? 'badge-active' : 'badge-contained'}">${isActive ? 'Active' : 'Contained'}</span>
@@ -912,15 +832,18 @@ function processFeatures(geojson, incidentSizeMap) {
 
     fireLayers.addLayer(poly);
 
-    // Dashed connector line for fires >25km — mirrors your isolated_lines in R
-    if (distKm > 25 && station) {
-      gapLayers.addLayer(L.polyline(
-        [[cLat, cLon], [station.lat, station.lon]],
-        { color: '#E8B800', weight: 1, dashArray: '4 6', opacity: 0.55 }
-      ));
+    // Dashed gap line for fires >25km — mirrors R isolated_lines
+    if (finalDist > 25 && finalStn) {
+      const stn = STATIONS.find(s => s.name === finalStn);
+      if (stn) {
+        gapLayers.addLayer(L.polyline(
+          [[cLat, cLon], [stn.lat, stn.lon]],
+          { color: '#E8B800', weight: 1, dashArray: '4 6', opacity: 0.55 }
+        ));
+      }
     }
 
-    // Labels for top 10 fires by acres — mirrors your n_label = min(10, n_total)
+    // Labels for top 10 fires — mirrors R n_label = min(10, n_total)
     if (idx < 10 && acres > 0) {
       const acLabel = acres >= 1000 ? (acres/1000).toFixed(1) + 'k ac' : Math.round(acres) + ' ac';
       labelLayers.addLayer(L.marker([cLat, cLon], {
@@ -956,7 +879,7 @@ function processFeatures(geojson, incidentSizeMap) {
   const farPct = distances.length ? (over50 / distances.length * 100) : 0;
   const now = new Date().toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  updateHeader(features.length, activeCount, containedCount, totalAcres, medianDist, farPct);
+  updateHeader(features.length, activeCount, containedCount, totalAcres);
 
   document.getElementById('sb-fires').textContent     = features.length;
   document.getElementById('sb-acres').textContent     = fmtAcres(totalAcres);
@@ -968,89 +891,58 @@ function processFeatures(geojson, incidentSizeMap) {
   document.getElementById('gap-label').textContent    = farPct.toFixed(1) + '%';
   document.getElementById('gap-fill').style.width     = Math.min(farPct * 2.5, 100) + '%';
   document.getElementById('timestamp').textContent    =
-    `DATA: NIFC WFIGS · FETCHED ${now} · ${features.length} PERIMETERS`;
+    `DATA: NIFC WFIGS · ${features.length} PERIMETERS · ${now}`;
 
   document.getElementById('subtitle-text').textContent =
-    `${features.length.toLocaleString()} fire perimeters across California, Oregon, and Washington as of ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}. ` +
+    `${features.length.toLocaleString()} fire perimeters across California, Oregon, and Washington. ` +
     `${activeCount} fires remain active. Median distance to nearest station: ${medianDist.toFixed(1)} km.`;
 
   document.getElementById('caption-text').textContent =
-    `DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations  |  All perimeter types  |  Straight-line distances  |  ` +
+    `DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations  |  Straight-line distances  |  ` +
     `Acreage: best of IncidentSize / GISAcres  |  Analysis by B. Groves  |  ${now}`;
 
-  // Fit bounds to fires
-  if (fireLayers.getLayers().length > 0) {
-    try {
-      const bounds = fireLayers.getLayers()
-        .filter(l => l.getBounds)
-        .reduce((b, l) => {
-          try { return b ? b.extend(l.getBounds()) : l.getBounds(); } catch(e) { return b; }
-        }, null);
-      if (bounds) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
-    } catch(e) {}
-  }
+  // Fit bounds to fire perimeters
+  try {
+    const bounds = fireLayers.getLayers()
+      .filter(l => l.getBounds)
+      .reduce((b, l) => {
+        try { return b ? b.extend(l.getBounds()) : l.getBounds(); } catch(e) { return b; }
+      }, null);
+    if (bounds) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+  } catch(e) {}
 
   hideLoading();
 }
 
-function bestAcres(props, incidentSizeMap) {
-  // coalesce(na_if(IncidentSize, 0), GISAcres, 0) — R logic
-  const incName = props.IncidentName || '';
-  const incSize = incidentSizeMap[incName] || null;
-  const gisAcres = props.GISAcres || 0;
-  if (incSize && incSize > 0) return incSize;
-  if (gisAcres > 0) return gisAcres;
-  return 0;
-}
-
-function updateHeader(fires, active, contained, acres, median, farPct) {
+function updateHeader(fires, active, contained, acres) {
   document.getElementById('hdr-fires').textContent     = fires.toLocaleString();
-  document.getElementById('hdr-active').textContent    = active;
-  document.getElementById('hdr-contained').textContent = contained;
+  document.getElementById('hdr-active').textContent    = active || '—';
+  document.getElementById('hdr-contained').textContent = contained || '—';
   document.getElementById('hdr-acres').textContent     = fmtAcres(acres);
 }
 
 // =============================================================================
-// FETCH DATA
+// LOAD fires.geojson
+// Written by R/update_ytd_ci.R, committed by GitHub Actions each morning.
 // =============================================================================
 async function loadData() {
-  // First fetch incidents for IncidentSize (attr_IncidentSize in your R code)
-  let incidentSizeMap = {};
   try {
-    const incRes = await fetch(INCIDENTS_URL);
-    if (incRes.ok) {
-      const incData = await incRes.json();
-      (incData.features || []).forEach(f => {
-        const p = f.properties;
-        const name = p.IncidentName || '';
-        const sz = p.IncidentSize || p.DailyAcres || 0;
-        if (name && sz > 0) incidentSizeMap[name] = sz;
-      });
-    }
-  } catch(e) {
-    console.warn('Incident size fetch failed (non-fatal):', e);
-  }
-
-  // Then fetch perimeters (poly_ fields in your R code)
-  try {
-    const res = await fetch(PERIMETERS_URL);
+    const res = await fetch(GEOJSON_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    processFeatures(data, incidentSizeMap);
+    processFeatures(data);
   } catch(err) {
-    console.error('WFIGS perimeters fetch failed:', err);
+    console.error('fires.geojson load failed:', err);
     showError(
-      `Could not fetch live perimeters from WFIGS API.<br><br>` +
-      `<strong>Likely cause:</strong> CORS restriction — the browser is blocking the cross-origin request. ` +
-      `This is normal when viewing locally.<br><br>` +
-      `<strong>Fix:</strong> Add a <code>fires.geojson</code> export to your GitHub Actions workflow ` +
-      `and point this page to <code>./fires.geojson</code> instead — same origin, no CORS issue.`
+      `Could not load <code>output/fires.geojson</code>.<br><br>` +
+      `This file is written by <code>R/update_ytd_ci.R</code> and committed by GitHub Actions each morning. ` +
+      `It will appear after the first successful Actions run. ` +
+      `Check the <a href="https://github.com/bdgroves/wildfire-response-gaps/actions" style="color:#8B1A1A;">Actions tab</a> for status.`
     );
     hideLoading();
-    updateHeader(0, 0, 0, 0, 0, 0);
+    updateHeader(0, 0, 0, 0);
     document.getElementById('subtitle-text').textContent =
-      'Could not load live data — see sidebar for details.';
+      'fires.geojson not yet available — will populate after first GitHub Actions run.';
   }
 }
 
@@ -1064,7 +956,6 @@ function hideLoading() {
   document.getElementById('loading').classList.add('hidden');
 }
 
-// Boot
 loadData();
 </script>
 </body>
