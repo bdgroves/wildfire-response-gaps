@@ -2,8 +2,6 @@ name: Update Fire Map GeoJSON
 
 on:
   schedule:
-    # 5am Pacific (13:00 UTC) — runs 1hr before your R workflow
-    # so fires.geojson is fresh when the R map also updates
     - cron: '0 12 * * *'
   workflow_dispatch:
 
@@ -34,7 +32,8 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          git add output/fires.geojson output/ytd_fires_summary.txt
+          git add output/fires.geojson
+          git add output/ytd_fires_summary.txt || true
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No changes to fires.geojson"
