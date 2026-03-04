@@ -38,7 +38,6 @@
     flex-direction: column;
   }
 
-  /* ── HEADER ── */
   #header {
     background: var(--gold);
     padding: 0 20px;
@@ -77,7 +76,7 @@
     color: var(--ink);
     line-height: 1;
   }
-  .hstat-val.red { color: #8B1A1A; }
+  .hstat-val.red   { color: #8B1A1A; }
   .hstat-val.green { color: var(--cont-dark); }
 
   .hstat-lbl {
@@ -113,7 +112,6 @@
     50%       { opacity: 0.4; transform: scale(0.7); }
   }
 
-  /* ── SUBTITLE BAR ── */
   #subtitle {
     background: var(--parchment);
     border-bottom: 1px solid rgba(61,43,31,0.2);
@@ -124,10 +122,8 @@
     flex-shrink: 0;
   }
 
-  /* ── MAIN LAYOUT ── */
   #main { display: flex; flex: 1; overflow: hidden; }
 
-  /* ── SIDEBAR ── */
   #sidebar {
     width: var(--sidebar-w);
     background: var(--parchment);
@@ -258,6 +254,21 @@
   .swatch-active    { background: rgba(139,26,26,0.5); border: 1.5px solid #8B1A1A; }
   .swatch-contained { background: rgba(91,126,94,0.35); border: 1.5px solid var(--cont-dark); }
 
+  /* Pre-season notice box */
+  #preseason-box {
+    display: none;
+    margin: 10px 16px;
+    padding: 10px 12px;
+    background: rgba(232,184,0,0.1);
+    border: 1px solid rgba(232,184,0,0.4);
+    border-left: 3px solid var(--gold-dk);
+    border-radius: 2px;
+    font-size: 10px;
+    color: var(--ink-brown);
+    line-height: 1.6;
+  }
+
+  /* Error box */
   #error-box {
     display: none;
     margin: 10px 16px;
@@ -396,7 +407,7 @@
     text-transform: uppercase;
   }
 
-  .toggle-btn:hover { background: var(--parch-dk); color: var(--ink-brown); }
+  .toggle-btn:hover  { background: var(--parch-dk); color: var(--ink-brown); }
   .toggle-btn.active { border-color: var(--ink-brown); color: var(--ink-brown); font-weight: 600; }
 
   #loading {
@@ -425,13 +436,10 @@
     height: 100%;
     background: linear-gradient(90deg, var(--gold), var(--ember));
     width: 0%;
-    animation: load 3s ease forwards;
+    animation: load 2s ease forwards;
   }
   @keyframes load {
-    0%   { width: 0%; }
-    50%  { width: 70%; }
-    85%  { width: 88%; }
-    100% { width: 95%; }
+    0% { width: 0%; } 60% { width: 80%; } 100% { width: 95%; }
   }
 
   #caption {
@@ -584,11 +592,18 @@
     <div class="sidebar-panel">
       <div class="panel-title">About</div>
       <div style="font-size:10px; color:var(--ink-gray); line-height:1.6;">
-        Fire perimeters from <strong style="color:var(--ink-brown)">NIFC WFIGS</strong>, exported daily by GitHub Actions. Stations from OpenStreetMap. Updated at 6am Pacific.<br><br>
+        Fire perimeters from <strong style="color:var(--ink-brown)">NIFC WFIGS</strong>, fetched daily by <code>python/fetch_fires.py</code> via GitHub Actions. Stations from OpenStreetMap. Updated at 5am Pacific.<br><br>
         Analysis by <strong style="color:var(--ink-brown)">B. Groves</strong> · <a href="https://github.com/bdgroves/wildfire-response-gaps" target="_blank" style="color:#8B1A1A;">wildfire-response-gaps</a>
       </div>
     </div>
 
+    <!-- Pre-season notice — shown when fires.geojson exists but is empty -->
+    <div id="preseason-box">
+      🌲 <strong>Pre-season</strong> — No mapped fire perimeters on the West Coast yet for 2026.<br><br>
+      Fire stations are shown on the map. Perimeters will appear automatically as the season builds, typically starting late May in California and Oregon.
+    </div>
+
+    <!-- Error — shown only if fires.geojson can't be loaded at all -->
     <div id="error-box"></div>
 
     <div class="timestamp" id="timestamp">LOADING…</div>
@@ -597,7 +612,7 @@
   <div id="map-container">
     <div id="loading">
       <div style="font-size:42px;">🔥</div>
-      <div class="loading-text">Loading fire perimeters…</div>
+      <div class="loading-text">Loading fire data…</div>
       <div class="loading-bar"><div class="loading-progress"></div></div>
     </div>
 
@@ -622,17 +637,8 @@
 </div>
 
 <script>
-// =============================================================================
-// DATA SOURCE
-// fires.geojson is written by update_ytd_ci.R via sf::st_write() and committed
-// by GitHub Actions alongside ytd_natgeo.png each morning.
-// Same origin as this page — no CORS issues.
-// Fields from R: acres, is_active, status, state, dist_nearest_km,
-//                nearest_station_name, attr_IncidentName, attr_PercentContained
-// =============================================================================
 const GEOJSON_URL = './output/fires.geojson';
 
-// Key fire stations — mirrors your R all_stations_wc_clean
 const STATIONS = [
   { name: "Frenchglen Fire Guard Station", lat: 42.814, lon: -118.934 },
   { name: "Burns Interagency Fire Zone",   lat: 43.587, lon: -119.054 },
@@ -654,12 +660,7 @@ const STATIONS = [
 // =============================================================================
 // MAP INIT
 // =============================================================================
-const map = L.map('map', {
-  center: [44.0, -120.5],
-  zoom: 6,
-  zoomControl: true,
-  attributionControl: true
-});
+const map = L.map('map', { center: [44.0, -120.5], zoom: 6 });
 
 L.tileLayer(
   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
@@ -689,13 +690,13 @@ function toggleLayer(name) {
 }
 
 // =============================================================================
-// STATION MARKERS
+// STATION MARKERS — always rendered regardless of fire count
 // =============================================================================
 const stationIcon = L.divIcon({
   className: '',
   html: `<div style="color:#3D2B1F;font-size:13px;line-height:1;
     text-shadow:0 1px 3px rgba(255,255,255,0.8);cursor:pointer;">▲</div>`,
-  iconSize: [13,13], iconAnchor: [6,6]
+  iconSize: [13, 13], iconAnchor: [6, 6]
 });
 
 STATIONS.forEach(s => {
@@ -714,10 +715,9 @@ STATIONS.forEach(s => {
 // HELPERS
 // =============================================================================
 function haversineKm(lat1, lon1, lat2, lon2) {
-  const R = 6371, toRad = d => d * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+  const R = 6371, r = d => d * Math.PI / 180;
+  const a = Math.sin(r(lat2-lat1)/2)**2 +
+            Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(r(lon2-lon1)/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
@@ -750,10 +750,7 @@ function fmtAcres(x) {
 }
 
 // =============================================================================
-// PROCESS GEOJSON
-// R writes these fields directly into fires.geojson:
-//   acres, is_active, status, state, dist_nearest_km, nearest_station_name,
-//   attr_IncidentName, attr_PercentContained
+// PROCESS FEATURES
 // =============================================================================
 function processFeatures(geojson) {
   fireLayers.clearLayers();
@@ -761,15 +758,31 @@ function processFeatures(geojson) {
   labelLayers.clearLayers();
 
   const features = geojson.features || [];
+  const now = new Date().toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
+  // Pre-season: no fires yet — show friendly message, keep stations visible
   if (features.length === 0) {
-    showError("No fire perimeters in fires.geojson. This is expected early in the season (Feb–May) before fires have mapped perimeters.");
+    document.getElementById('preseason-box').style.display = 'block';
+    document.getElementById('hdr-fires').textContent     = '0';
+    document.getElementById('hdr-active').textContent    = '0';
+    document.getElementById('hdr-contained').textContent = '0';
+    document.getElementById('hdr-acres').textContent     = '—';
+    document.getElementById('sb-fires').textContent      = '0';
+    document.getElementById('sb-acres').textContent      = '—';
+    document.getElementById('sb-active').textContent     = '0';
+    document.getElementById('sb-contained').textContent  = '0';
+    document.getElementById('sb-updated').textContent    = now;
+    document.getElementById('sb-median').textContent     = '—';
+    document.getElementById('sb-pct50').textContent      = '—';
+    document.getElementById('subtitle-text').textContent =
+      'No mapped fire perimeters on the West Coast yet for 2026 — pre-season. Fire stations shown below.';
+    document.getElementById('timestamp').textContent =
+      `DATA: NIFC WFIGS · 0 PERIMETERS · ${now}`;
     hideLoading();
-    updateHeader(0, 0, 0, 0);
     return;
   }
 
-  // Sort by acres desc — mirrors R arrange(desc(acres))
+  // Sort by acres desc
   features.sort((a, b) => (b.properties.acres || 0) - (a.properties.acres || 0));
 
   let totalAcres = 0, activeCount = 0, containedCount = 0;
@@ -778,8 +791,6 @@ function processFeatures(geojson) {
 
   features.forEach((f, idx) => {
     const p = f.properties;
-
-    // Fields written directly by R — use them as-is
     const acres    = p.acres || 0;
     const isActive = p.is_active === true || p.is_active === "TRUE";
     const state    = p.state || '—';
@@ -789,11 +800,9 @@ function processFeatures(geojson) {
     totalAcres += acres;
     if (isActive) activeCount++; else containedCount++;
 
-    // Centroid for gap lines and labels
     let cLat, cLon;
     try { [cLat, cLon] = centroid(f.geometry); } catch(e) { return; }
 
-    // Use R-computed distance when available, fall back to browser haversine
     let finalDist = p.dist_nearest_km || null;
     let finalStn  = p.nearest_station_name || null;
     if (!finalDist) {
@@ -832,7 +841,6 @@ function processFeatures(geojson) {
 
     fireLayers.addLayer(poly);
 
-    // Dashed gap line for fires >25km — mirrors R isolated_lines
     if (finalDist > 25 && finalStn) {
       const stn = STATIONS.find(s => s.name === finalStn);
       if (stn) {
@@ -843,7 +851,6 @@ function processFeatures(geojson) {
       }
     }
 
-    // Labels for top 10 fires — mirrors R n_label = min(10, n_total)
     if (idx < 10 && acres > 0) {
       const acLabel = acres >= 1000 ? (acres/1000).toFixed(1) + 'k ac' : Math.round(acres) + ' ac';
       labelLayers.addLayer(L.marker([cLat, cLon], {
@@ -855,14 +862,10 @@ function processFeatures(geojson) {
             border-left:2px solid ${lineColor};
             color:${isActive ? '#8B1A1A' : '#3D5C3F'};
             font-family:'Source Code Pro',monospace;
-            font-size:8px;
-            padding:2px 5px;
-            white-space:nowrap;
-            pointer-events:none;
-            line-height:1.4;
-            box-shadow:0 1px 4px rgba(0,0,0,0.15);
-          ">
-            <strong>${incName.length > 20 ? incName.slice(0,20) + '…' : incName}</strong><br>
+            font-size:8px;padding:2px 5px;
+            white-space:nowrap;pointer-events:none;
+            line-height:1.4;box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+            <strong>${incName.length > 20 ? incName.slice(0,20)+'…' : incName}</strong><br>
             ${acLabel}${isActive ? ' · ACTIVE' : ''}
           </div>`,
           iconAnchor: [0, 0]
@@ -872,58 +875,44 @@ function processFeatures(geojson) {
     }
   });
 
-  // ── Update all stats ──
   const medianDist = distances.length
-    ? [...distances].sort((a,b)=>a-b)[Math.floor(distances.length/2)]
-    : 0;
+    ? [...distances].sort((a,b)=>a-b)[Math.floor(distances.length/2)] : 0;
   const farPct = distances.length ? (over50 / distances.length * 100) : 0;
-  const now = new Date().toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  updateHeader(features.length, activeCount, containedCount, totalAcres);
-
-  document.getElementById('sb-fires').textContent     = features.length;
-  document.getElementById('sb-acres').textContent     = fmtAcres(totalAcres);
-  document.getElementById('sb-active').textContent    = activeCount;
-  document.getElementById('sb-contained').textContent = containedCount;
-  document.getElementById('sb-updated').textContent   = now;
-  document.getElementById('sb-median').textContent    = medianDist.toFixed(1) + ' km';
-  document.getElementById('sb-pct50').textContent     = farPct.toFixed(1) + '%';
-  document.getElementById('gap-label').textContent    = farPct.toFixed(1) + '%';
-  document.getElementById('gap-fill').style.width     = Math.min(farPct * 2.5, 100) + '%';
-  document.getElementById('timestamp').textContent    =
+  document.getElementById('hdr-fires').textContent     = features.length.toLocaleString();
+  document.getElementById('hdr-active').textContent    = activeCount;
+  document.getElementById('hdr-contained').textContent = containedCount;
+  document.getElementById('hdr-acres').textContent     = fmtAcres(totalAcres);
+  document.getElementById('sb-fires').textContent      = features.length;
+  document.getElementById('sb-acres').textContent      = fmtAcres(totalAcres);
+  document.getElementById('sb-active').textContent     = activeCount;
+  document.getElementById('sb-contained').textContent  = containedCount;
+  document.getElementById('sb-updated').textContent    = now;
+  document.getElementById('sb-median').textContent     = medianDist.toFixed(1) + ' km';
+  document.getElementById('sb-pct50').textContent      = farPct.toFixed(1) + '%';
+  document.getElementById('gap-label').textContent     = farPct.toFixed(1) + '%';
+  document.getElementById('gap-fill').style.width      = Math.min(farPct * 2.5, 100) + '%';
+  document.getElementById('timestamp').textContent     =
     `DATA: NIFC WFIGS · ${features.length} PERIMETERS · ${now}`;
-
   document.getElementById('subtitle-text').textContent =
     `${features.length.toLocaleString()} fire perimeters across California, Oregon, and Washington. ` +
     `${activeCount} fires remain active. Median distance to nearest station: ${medianDist.toFixed(1)} km.`;
-
   document.getElementById('caption-text').textContent =
     `DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations  |  Straight-line distances  |  ` +
     `Acreage: best of IncidentSize / GISAcres  |  Analysis by B. Groves  |  ${now}`;
 
-  // Fit bounds to fire perimeters
   try {
     const bounds = fireLayers.getLayers()
       .filter(l => l.getBounds)
-      .reduce((b, l) => {
-        try { return b ? b.extend(l.getBounds()) : l.getBounds(); } catch(e) { return b; }
-      }, null);
+      .reduce((b, l) => { try { return b ? b.extend(l.getBounds()) : l.getBounds(); } catch(e) { return b; } }, null);
     if (bounds) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
   } catch(e) {}
 
   hideLoading();
 }
 
-function updateHeader(fires, active, contained, acres) {
-  document.getElementById('hdr-fires').textContent     = fires.toLocaleString();
-  document.getElementById('hdr-active').textContent    = active || '—';
-  document.getElementById('hdr-contained').textContent = contained || '—';
-  document.getElementById('hdr-acres').textContent     = fmtAcres(acres);
-}
-
 // =============================================================================
-// LOAD fires.geojson
-// Written by R/update_ytd_ci.R, committed by GitHub Actions each morning.
+// LOAD
 // =============================================================================
 async function loadData() {
   try {
@@ -933,23 +922,15 @@ async function loadData() {
     processFeatures(data);
   } catch(err) {
     console.error('fires.geojson load failed:', err);
-    showError(
-      `Could not load <code>output/fires.geojson</code>.<br><br>` +
-      `This file is written by <code>R/update_ytd_ci.R</code> and committed by GitHub Actions each morning. ` +
-      `It will appear after the first successful Actions run. ` +
-      `Check the <a href="https://github.com/bdgroves/wildfire-response-gaps/actions" style="color:#8B1A1A;">Actions tab</a> for status.`
-    );
-    hideLoading();
-    updateHeader(0, 0, 0, 0);
+    document.getElementById('error-box').innerHTML =
+      `⚠ Could not load <code>output/fires.geojson</code>. ` +
+      `This file is written by <code>python/fetch_fires.py</code> and committed by GitHub Actions each morning. ` +
+      `Check the <a href="https://github.com/bdgroves/wildfire-response-gaps/actions" style="color:#8B1A1A;">Actions tab</a> for status.`;
+    document.getElementById('error-box').style.display = 'block';
     document.getElementById('subtitle-text').textContent =
-      'fires.geojson not yet available — will populate after first GitHub Actions run.';
+      'Could not load fire data — see sidebar for details.';
+    hideLoading();
   }
-}
-
-function showError(msg) {
-  const box = document.getElementById('error-box');
-  box.innerHTML = `⚠ ${msg}`;
-  box.style.display = 'block';
 }
 
 function hideLoading() {
