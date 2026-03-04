@@ -1,9 +1,9 @@
 # 🔥 WILDFIRE RESPONSE GAP ANALYSIS
 
 [![Last Updated](https://img.shields.io/github/last-commit/bdgroves/wildfire-response-gaps?label=Last%20Updated&color=ff4500)](https://github.com/bdgroves/wildfire-response-gaps/commits/main)
-[![YTD Status](https://img.shields.io/badge/2026%20Season-Live-red)](https://bdgroves.github.io/wildfire-response-gaps/)
-[![R CI](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_ytd_map.yml/badge.svg)](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_ytd_map.yml)
-[![Fire Map](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_fire_map.yml/badge.svg)](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_fire_map.yml)
+[![2026 Season](https://img.shields.io/badge/2026%20Season-Live-red)](https://bdgroves.github.io/wildfire-response-gaps/)
+[![Update NatGeo Map](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_ytd_map.yml/badge.svg?branch=main)](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_ytd_map.yml)
+[![Update Fire Map GeoJSON](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_fire_map.yml/badge.svg?branch=main)](https://github.com/bdgroves/wildfire-response-gaps/actions/workflows/update_fire_map.yml)
 
 ---
 
