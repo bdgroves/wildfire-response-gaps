@@ -1,0 +1,53 @@
+name: Update Fire Map GeoJSON
+
+on:
+  schedule:
+    # 5am Pacific (13:00 UTC) — runs 1hr before your R workflow
+    # so fires.geojson is fresh when the R map also updates
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-fire-map:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch fire data and write fires.geojson
+        run: python python/fetch_fires.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git add output/fires.geojson output/ytd_fires_summary.txt
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to fires.geojson"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "fires.geojson updated"
+          fi
+
+      - name: Commit and push
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          SUMMARY=$(cat output/ytd_fires_summary.txt 2>/dev/null || echo "fires updated")
+          git commit -m "Fire map update $(date +'%Y-%m-%d') — ${SUMMARY}"
+          git push
