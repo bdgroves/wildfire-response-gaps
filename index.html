@@ -5,36 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🔥 West Coast Wildfire Response Gap — Live Tracker</title>
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
 <style>
   :root {
-    --fire: #E8450A;
-    --ember: #FF7B2E;
-    --smoke: #8B7355;
-    --ash: #C4B89A;
-    --charcoal: #1A1712;
-    --soot: #2A2520;
-    --bark: #3D3328;
-    --parchment: #F2EBD9;
-    --ink: #14110D;
-    --contained: #3A8C4E;
-    --station: #2A6496;
-    --gap-line: #FF7B2E;
-    --sidebar-w: 320px;
+    --fire:      #C0392B;
+    --ember:     #E67E22;
+    --gold:      #FFCE00;
+    --gold-dk:   #E8B800;
+    --parchment: #F5F0E1;
+    --parch-dk:  #EDE5D0;
+    --ink:       #1A1A1A;
+    --ink-brown: #3D2B1F;
+    --ink-gray:  #5C5C5C;
+    --contained: #5B7E5E;
+    --cont-dark: #3D5C3F;
+    --sidebar-w: 300px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--charcoal);
-    color: var(--parchment);
+    background: var(--ink);
+    color: var(--ink-brown);
     font-family: 'Libre Baskerville', serif;
     height: 100vh;
     overflow: hidden;
@@ -42,74 +38,57 @@
     flex-direction: column;
   }
 
-  /* ── TOP HEADER BAR ── */
+  /* ── HEADER ── */
   #header {
-    background: var(--ink);
-    border-bottom: 2px solid var(--fire);
-    padding: 0 24px;
+    background: var(--gold);
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    gap: 24px;
-    height: 56px;
+    gap: 16px;
+    height: 52px;
     flex-shrink: 0;
+    border-bottom: 3px solid var(--gold-dk);
     position: relative;
     z-index: 1000;
   }
 
-  #header .flame-icon {
-    font-size: 22px;
-    animation: flicker 1.8s ease-in-out infinite alternate;
-  }
-
-  @keyframes flicker {
-    0%   { transform: scaleY(1)   rotate(-1deg); opacity: 1; }
-    50%  { transform: scaleY(1.1) rotate(1deg);  opacity: 0.9; }
-    100% { transform: scaleY(0.95) rotate(-2deg); opacity: 1; }
-  }
-
   #header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 900;
-    letter-spacing: 0.04em;
-    color: var(--parchment);
+    letter-spacing: 0.03em;
+    color: var(--ink);
     white-space: nowrap;
   }
-
-  #header h1 span { color: var(--fire); }
 
   .header-stats {
     margin-left: auto;
     display: flex;
-    gap: 28px;
+    gap: 24px;
     align-items: center;
   }
 
-  .hstat {
-    text-align: right;
-  }
+  .hstat { text-align: right; }
 
   .hstat-val {
     font-family: 'Source Code Pro', monospace;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
-    color: var(--ember);
+    color: var(--ink);
     line-height: 1;
   }
+  .hstat-val.red { color: #8B1A1A; }
+  .hstat-val.green { color: var(--cont-dark); }
 
   .hstat-lbl {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ash);
+    color: var(--ink-gray);
     margin-top: 2px;
   }
 
-  .header-divider {
-    width: 1px;
-    height: 32px;
-    background: var(--bark);
-  }
+  .header-divider { width: 1px; height: 30px; background: rgba(0,0,0,0.15); }
 
   .live-badge {
     display: flex;
@@ -118,15 +97,14 @@
     font-family: 'Source Code Pro', monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
-    color: var(--fire);
+    color: var(--ink);
     text-transform: uppercase;
+    font-weight: 600;
   }
 
   .live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--fire);
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #8B1A1A;
     animation: pulse 2s ease-in-out infinite;
   }
 
@@ -135,41 +113,45 @@
     50%       { opacity: 0.4; transform: scale(0.7); }
   }
 
-  /* ── MAIN LAYOUT ── */
-  #main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
+  /* ── SUBTITLE BAR ── */
+  #subtitle {
+    background: var(--parchment);
+    border-bottom: 1px solid rgba(61,43,31,0.2);
+    padding: 5px 20px;
+    font-size: 11px;
+    color: var(--ink-brown);
+    font-style: italic;
+    flex-shrink: 0;
   }
+
+  /* ── MAIN LAYOUT ── */
+  #main { display: flex; flex: 1; overflow: hidden; }
 
   /* ── SIDEBAR ── */
   #sidebar {
     width: var(--sidebar-w);
-    background: var(--soot);
-    border-right: 1px solid var(--bark);
+    background: var(--parchment);
+    border-right: 1px solid rgba(61,43,31,0.2);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     flex-shrink: 0;
     scrollbar-width: thin;
-    scrollbar-color: var(--bark) transparent;
+    scrollbar-color: rgba(61,43,31,0.3) transparent;
   }
 
-  #sidebar::-webkit-scrollbar { width: 4px; }
-  #sidebar::-webkit-scrollbar-thumb { background: var(--bark); border-radius: 2px; }
-
   .sidebar-panel {
-    border-bottom: 1px solid var(--bark);
-    padding: 18px 20px;
+    border-bottom: 1px solid rgba(61,43,31,0.15);
+    padding: 14px 16px;
   }
 
   .panel-title {
     font-family: 'Source Code Pro', monospace;
-    font-size: 9px;
-    letter-spacing: 0.18em;
+    font-size: 8px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--smoke);
-    margin-bottom: 14px;
+    color: var(--ink-gray);
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -179,69 +161,59 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--bark);
+    background: rgba(61,43,31,0.15);
   }
 
-  /* Season overview */
-  .stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  /* Stat grid */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   .stat-box {
-    background: var(--charcoal);
-    border: 1px solid var(--bark);
-    border-radius: 3px;
-    padding: 10px 12px;
+    background: var(--parch-dk);
+    border: 1px solid rgba(61,43,31,0.15);
+    border-radius: 2px;
+    padding: 9px 11px;
   }
 
   .stat-box.full { grid-column: 1 / -1; }
 
   .stat-box .val {
     font-family: 'Source Code Pro', monospace;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
-    color: var(--ember);
+    color: var(--ink-brown);
     line-height: 1;
   }
 
-  .stat-box .val.red { color: var(--fire); }
-  .stat-box .val.green { color: var(--contained); }
+  .stat-box .val.red   { color: #8B1A1A; }
+  .stat-box .val.green { color: var(--cont-dark); }
 
   .stat-box .lbl {
-    font-size: 10px;
-    color: var(--ash);
-    margin-top: 4px;
+    font-size: 9px;
+    color: var(--ink-gray);
+    margin-top: 3px;
     line-height: 1.3;
   }
 
   /* Coverage bar */
-  .coverage-bar-wrap {
-    margin: 12px 0 6px;
-  }
+  .coverage-bar-wrap { margin: 10px 0 4px; }
 
   .bar-label-row {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
-    color: var(--ash);
-    margin-bottom: 5px;
+    font-size: 9px;
+    color: var(--ink-gray);
+    margin-bottom: 4px;
     font-family: 'Source Code Pro', monospace;
   }
 
-  .coverage-bar {
-    height: 8px;
-    background: var(--bark);
-    border-radius: 2px;
-    overflow: hidden;
-  }
+  .coverage-bar { height: 6px; background: rgba(61,43,31,0.15); border-radius: 2px; overflow: hidden; }
 
   .coverage-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--fire), var(--ember));
+    background: linear-gradient(90deg, #8B1A1A, var(--ember));
     border-radius: 2px;
-    transition: width 1s ease;
+    transition: width 1.2s ease;
+    width: 0%;
   }
 
   /* State rows */
@@ -249,351 +221,283 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--bark);
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(61,43,31,0.1);
   }
-
   .state-row:last-child { border-bottom: none; }
 
   .state-abbr {
     font-family: 'Source Code Pro', monospace;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    color: var(--ash);
-    width: 24px;
+    color: var(--ink-gray);
+    width: 22px;
     flex-shrink: 0;
   }
 
-  .state-bar-track {
-    flex: 1;
-    height: 5px;
-    background: var(--bark);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .state-bar-fill {
-    height: 100%;
-    border-radius: 2px;
-  }
+  .state-bar-track { flex: 1; height: 4px; background: rgba(61,43,31,0.12); border-radius: 2px; overflow: hidden; }
+  .state-bar-fill  { height: 100%; border-radius: 2px; }
 
   .state-dist {
     font-family: 'Source Code Pro', monospace;
-    font-size: 11px;
-    color: var(--ember);
-    width: 52px;
+    font-size: 10px;
+    color: #8B1A1A;
+    width: 50px;
     text-align: right;
     flex-shrink: 0;
   }
 
-  /* Station list */
-  .station-item {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--bark);
-  }
-
-  .station-item:last-child { border-bottom: none; }
-
-  .station-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--parchment);
-    margin-bottom: 4px;
-  }
-
-  .station-meta {
-    font-family: 'Source Code Pro', monospace;
-    font-size: 10px;
-    color: var(--ash);
-    display: flex;
-    gap: 10px;
-  }
-
-  .station-meta .fires { color: var(--fire); }
-
   /* Legend */
-  .legend-items {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
+  .legend-items { display: flex; flex-direction: column; gap: 7px; }
 
   .legend-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 11px;
-    color: var(--ash);
+    font-size: 10px;
+    color: var(--ink-brown);
   }
 
   .legend-swatch {
     width: 18px;
     height: 12px;
-    border-radius: 2px;
+    border-radius: 1px;
     flex-shrink: 0;
   }
 
-  .legend-swatch.active   { background: rgba(232,69,10,0.7); border: 2px solid var(--fire); }
-  .legend-swatch.contained { background: rgba(58,140,78,0.5); border: 2px solid var(--contained); }
-  .legend-swatch.station  { 
-    background: none; 
-    border: none;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  .legend-swatch.gap-line {
-    background: none;
-    border-top: 2px dashed var(--gap-line);
-    height: 0;
-    margin-top: 5px;
+  .swatch-active    { background: rgba(139,26,26,0.5); border: 1.5px solid #8B1A1A; }
+  .swatch-contained { background: rgba(91,126,94,0.35); border: 1.5px solid var(--cont-dark); }
+
+  /* Error box */
+  #error-box {
+    display: none;
+    margin: 10px 16px;
+    padding: 10px 12px;
+    background: rgba(139,26,26,0.08);
+    border: 1px solid rgba(139,26,26,0.25);
+    border-radius: 2px;
+    font-size: 10px;
+    color: #8B1A1A;
+    line-height: 1.5;
   }
 
   /* Timestamp */
   .timestamp {
-    padding: 12px 20px;
+    padding: 10px 16px;
     font-family: 'Source Code Pro', monospace;
-    font-size: 9px;
-    color: var(--smoke);
-    letter-spacing: 0.08em;
-    border-top: 1px solid var(--bark);
+    font-size: 8px;
+    color: var(--ink-gray);
+    letter-spacing: 0.06em;
+    border-top: 1px solid rgba(61,43,31,0.12);
     margin-top: auto;
+    line-height: 1.5;
   }
 
   /* ── MAP ── */
-  #map-container {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-  }
+  #map-container { flex: 1; position: relative; overflow: hidden; }
+  #map { width: 100%; height: 100%; }
 
-  #map {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Leaflet overrides for dark theme */
-  .leaflet-container {
-    background: #1a1812 !important;
-    font-family: 'Source Code Pro', monospace !important;
-  }
+  /* Leaflet dark-ish overrides to match parchment theme */
+  .leaflet-container { background: #c8b99a !important; }
 
   .leaflet-control-zoom a {
-    background: var(--soot) !important;
-    color: var(--parchment) !important;
-    border-color: var(--bark) !important;
+    background: var(--parchment) !important;
+    color: var(--ink-brown) !important;
+    border-color: rgba(61,43,31,0.3) !important;
   }
-
-  .leaflet-control-zoom a:hover {
-    background: var(--bark) !important;
-  }
+  .leaflet-control-zoom a:hover { background: var(--parch-dk) !important; }
 
   .leaflet-control-attribution {
-    background: rgba(26,23,18,0.85) !important;
-    color: var(--smoke) !important;
+    background: rgba(245,240,225,0.9) !important;
+    color: var(--ink-gray) !important;
     font-size: 9px !important;
   }
+  .leaflet-control-attribution a { color: var(--ink-brown) !important; }
 
-  .leaflet-control-attribution a { color: var(--ash) !important; }
-
-  /* Custom popup */
+  /* Popups */
   .leaflet-popup-content-wrapper {
-    background: var(--soot) !important;
-    border: 1px solid var(--bark) !important;
-    border-radius: 4px !important;
-    color: var(--parchment) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
+    background: var(--parchment) !important;
+    border: 1px solid rgba(61,43,31,0.3) !important;
+    border-radius: 2px !important;
+    color: var(--ink-brown) !important;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.25) !important;
   }
-
-  .leaflet-popup-tip { background: var(--soot) !important; }
-  .leaflet-popup-close-button { color: var(--ash) !important; }
+  .leaflet-popup-tip { background: var(--parchment) !important; }
+  .leaflet-popup-close-button { color: var(--ink-gray) !important; }
 
   .fire-popup h3 {
     font-family: 'Playfair Display', serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--fire);
+    color: #8B1A1A;
     margin-bottom: 8px;
-    border-bottom: 1px solid var(--bark);
-    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(61,43,31,0.15);
+    padding-bottom: 5px;
   }
 
   .fire-popup table {
     width: 100%;
     border-collapse: collapse;
     font-family: 'Source Code Pro', monospace;
-    font-size: 11px;
+    font-size: 10px;
   }
 
-  .fire-popup td {
-    padding: 3px 0;
-    color: var(--ash);
-  }
+  .fire-popup td { padding: 2px 0; color: var(--ink-gray); }
+  .fire-popup td:last-child { color: var(--ink-brown); text-align: right; font-weight: 600; }
 
-  .fire-popup td:last-child {
-    color: var(--parchment);
-    text-align: right;
-    font-weight: 600;
-  }
-
-  .fire-popup .badge {
+  .popup-badge {
     display: inline-block;
     padding: 2px 7px;
     border-radius: 2px;
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 600;
     margin-top: 6px;
+    font-family: 'Source Code Pro', monospace;
   }
+  .badge-active    { background: rgba(139,26,26,0.1); color: #8B1A1A; border: 1px solid #8B1A1A; }
+  .badge-contained { background: rgba(91,126,94,0.1); color: var(--cont-dark); border: 1px solid var(--cont-dark); }
 
-  .badge-active    { background: rgba(232,69,10,0.25); color: var(--fire); border: 1px solid var(--fire); }
-  .badge-contained { background: rgba(58,140,78,0.25); color: var(--contained); border: 1px solid var(--contained); }
-
-  /* Map overlay title */
-  #map-title-overlay {
+  /* Map overlay */
+  #map-overlay {
     position: absolute;
-    top: 16px;
-    left: 16px;
+    top: 14px;
+    left: 14px;
     z-index: 500;
-    background: rgba(26,23,18,0.88);
-    border: 1px solid var(--bark);
-    border-left: 3px solid var(--fire);
-    padding: 10px 14px;
-    max-width: 280px;
-    backdrop-filter: blur(4px);
+    background: rgba(245,240,225,0.93);
+    border: 1px solid rgba(61,43,31,0.25);
+    border-left: 3px solid var(--gold);
+    padding: 9px 13px;
+    max-width: 260px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
 
-  #map-title-overlay h2 {
+  #map-overlay h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 900;
-    color: var(--parchment);
+    color: var(--ink);
     line-height: 1.3;
   }
 
-  #map-title-overlay p {
+  #map-overlay p {
     font-family: 'Source Code Pro', monospace;
-    font-size: 9px;
-    color: var(--smoke);
-    margin-top: 4px;
-    letter-spacing: 0.06em;
+    font-size: 8px;
+    color: var(--ink-gray);
+    margin-top: 3px;
+    letter-spacing: 0.05em;
   }
 
-  /* Layer toggle */
+  /* Layer toggles */
   #layer-toggle {
     position: absolute;
-    bottom: 28px;
-    right: 16px;
+    bottom: 32px;
+    right: 12px;
     z-index: 500;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
   }
 
   .toggle-btn {
-    background: rgba(26,23,18,0.88);
-    border: 1px solid var(--bark);
-    color: var(--ash);
+    background: rgba(245,240,225,0.93);
+    border: 1px solid rgba(61,43,31,0.25);
+    color: var(--ink-gray);
     font-family: 'Source Code Pro', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    padding: 6px 12px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 5px 11px;
     cursor: pointer;
     transition: all 0.15s;
     text-transform: uppercase;
-    backdrop-filter: blur(4px);
   }
 
-  .toggle-btn:hover, .toggle-btn.active {
-    background: var(--bark);
-    color: var(--parchment);
-    border-color: var(--ember);
-  }
+  .toggle-btn:hover { background: var(--parch-dk); color: var(--ink-brown); }
+  .toggle-btn.active { border-color: var(--ink-brown); color: var(--ink-brown); font-weight: 600; }
 
-  /* Loading overlay */
+  /* Loading */
   #loading {
     position: absolute;
     inset: 0;
-    background: var(--charcoal);
+    background: var(--parchment);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    gap: 16px;
+    gap: 14px;
   }
-
   #loading.hidden { display: none; }
-
-  .loading-flame {
-    font-size: 48px;
-    animation: flicker 1s ease-in-out infinite alternate;
-  }
 
   .loading-text {
     font-family: 'Source Code Pro', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    color: var(--smoke);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--ink-gray);
     text-transform: uppercase;
   }
 
-  .loading-bar {
-    width: 180px;
-    height: 2px;
-    background: var(--bark);
-    border-radius: 1px;
-    overflow: hidden;
-  }
-
+  .loading-bar { width: 160px; height: 2px; background: rgba(61,43,31,0.15); border-radius: 1px; overflow: hidden; }
   .loading-progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--fire), var(--ember));
+    background: linear-gradient(90deg, var(--gold), var(--ember));
     width: 0%;
-    animation: load 2.5s ease forwards;
+    animation: load 3s ease forwards;
   }
-
   @keyframes load {
     0%   { width: 0%; }
-    60%  { width: 75%; }
-    90%  { width: 90%; }
-    100% { width: 100%; }
+    50%  { width: 70%; }
+    85%  { width: 88%; }
+    100% { width: 95%; }
   }
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    :root { --sidebar-w: 260px; }
-    #header h1 { font-size: 14px; }
-    .hstat-val { font-size: 15px; }
+  /* Caption bar */
+  #caption {
+    background: var(--parch-dk);
+    border-top: 1px solid rgba(61,43,31,0.2);
+    padding: 4px 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 8px;
+    color: var(--ink-gray);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
   }
+
+  #caption span { border-left: 2px solid var(--gold); padding-left: 8px; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- HEADER (NatGeo yellow bar) -->
 <header id="header">
-  <span class="flame-icon">🔥</span>
-  <h1>WEST COAST <span>WILDFIRE</span> RESPONSE GAP — <span>2026 LIVE TRACKER</span></h1>
+  <h1>🔥 2026 WEST COAST WILDFIRE SEASON — YEAR TO DATE</h1>
   <div class="header-stats">
-    <div class="live-badge">
-      <div class="live-dot"></div>
-      Live YTD
-    </div>
+    <div class="live-badge"><div class="live-dot"></div>Live</div>
     <div class="header-divider"></div>
     <div class="hstat">
-      <div class="hstat-val" id="hdr-fires">—</div>
-      <div class="hstat-lbl">Fires YTD</div>
+      <div class="hstat-val red" id="hdr-fires">—</div>
+      <div class="hstat-lbl">Perimeters</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val red" id="hdr-active">—</div>
+      <div class="hstat-lbl">Active</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val green" id="hdr-contained">—</div>
+      <div class="hstat-lbl">Contained</div>
     </div>
     <div class="hstat">
       <div class="hstat-val" id="hdr-acres">—</div>
-      <div class="hstat-lbl">Acres</div>
-    </div>
-    <div class="hstat">
-      <div class="hstat-val" id="hdr-active">—</div>
-      <div class="hstat-lbl">Active</div>
+      <div class="hstat-lbl">Total Acres</div>
     </div>
   </div>
 </header>
+
+<!-- SUBTITLE -->
+<div id="subtitle" id="subtitle-bar">
+  <span id="subtitle-text">Fetching live data from NIFC WFIGS…</span>
+</div>
 
 <!-- MAIN -->
 <div id="main">
@@ -601,13 +505,12 @@
   <!-- SIDEBAR -->
   <aside id="sidebar">
 
-    <!-- Season Overview -->
     <div class="sidebar-panel">
-      <div class="panel-title">Season Overview</div>
+      <div class="panel-title">Season at a Glance</div>
       <div class="stat-grid">
         <div class="stat-box">
           <div class="val red" id="sb-fires">—</div>
-          <div class="lbl">Total fires</div>
+          <div class="lbl">Fire perimeters</div>
         </div>
         <div class="stat-box">
           <div class="val" id="sb-acres">—</div>
@@ -622,98 +525,94 @@
           <div class="lbl">Contained</div>
         </div>
         <div class="stat-box full">
-          <div class="val" id="sb-updated">—</div>
-          <div class="lbl">Last updated (WFIGS API)</div>
+          <div class="val" style="font-size:13px;" id="sb-updated">—</div>
+          <div class="lbl">Last updated</div>
         </div>
       </div>
     </div>
 
-    <!-- Response Coverage -->
     <div class="sidebar-panel">
       <div class="panel-title">Response Coverage</div>
       <div class="stat-grid">
         <div class="stat-box">
-          <div class="val" id="sb-median-dist">—</div>
+          <div class="val" id="sb-median">—</div>
           <div class="lbl">Median km to nearest station</div>
         </div>
         <div class="stat-box">
-          <div class="val red" id="sb-far-pct">—</div>
-          <div class="lbl">Fires &gt;50km from station</div>
+          <div class="val red" id="sb-pct50">—</div>
+          <div class="lbl">Fires &gt;50 km from station</div>
         </div>
       </div>
       <div class="coverage-bar-wrap">
         <div class="bar-label-row">
-          <span>Gap exposure</span>
-          <span id="sb-gap-label">—</span>
+          <span>Gap exposure (&gt;50 km)</span>
+          <span id="gap-label">—</span>
         </div>
         <div class="coverage-bar">
-          <div class="coverage-fill" id="gap-fill" style="width:0%"></div>
+          <div class="coverage-fill" id="gap-fill"></div>
         </div>
       </div>
     </div>
 
-    <!-- State Breakdown -->
-    <div class="sidebar-panel" id="state-panel">
-      <div class="panel-title">State Breakdown</div>
-      <div id="state-rows">
-        <div class="state-row">
-          <span class="state-abbr">OR</span>
-          <div class="state-bar-track">
-            <div class="state-bar-fill" style="width:100%; background: var(--fire);"></div>
-          </div>
-          <span class="state-dist" id="or-dist">—</span>
+    <div class="sidebar-panel">
+      <div class="panel-title">Historical Baselines</div>
+      <div class="state-row">
+        <span class="state-abbr">OR</span>
+        <div class="state-bar-track">
+          <div class="state-bar-fill" style="width:100%; background:#8B1A1A;"></div>
         </div>
-        <div class="state-row">
-          <span class="state-abbr">CA</span>
-          <div class="state-bar-track">
-            <div class="state-bar-fill" id="ca-bar" style="width:40%; background: var(--ember);"></div>
-          </div>
-          <span class="state-dist" id="ca-dist">—</span>
-        </div>
-        <div class="state-row">
-          <span class="state-abbr">WA</span>
-          <div class="state-bar-track">
-            <div class="state-bar-fill" id="wa-bar" style="width:32%; background: var(--ash);"></div>
-          </div>
-          <span class="state-dist" id="wa-dist">—</span>
-        </div>
+        <span class="state-dist">26.7 km</span>
       </div>
-      <div style="font-size:10px; color:var(--smoke); margin-top:10px; font-style:italic; line-height:1.5;">
-        Historical median distance to nearest fire station. OR driven by eastern rangeland gap.
+      <div class="state-row">
+        <span class="state-abbr">CA</span>
+        <div class="state-bar-track">
+          <div class="state-bar-fill" style="width:40%; background:var(--ember);"></div>
+        </div>
+        <span class="state-dist">10.8 km</span>
+      </div>
+      <div class="state-row">
+        <span class="state-abbr">WA</span>
+        <div class="state-bar-track">
+          <div class="state-bar-fill" style="width:32%; background:var(--ink-gray);"></div>
+        </div>
+        <span class="state-dist">8.6 km</span>
+      </div>
+      <div style="font-size:9px; color:var(--ink-gray); margin-top:9px; font-style:italic; line-height:1.5;">
+        Median fire-to-station distance. Oregon driven by eastern rangeland gap — 30.1% of fires &gt;50 km vs &lt;2% in CA/WA.
       </div>
     </div>
 
-    <!-- Legend -->
     <div class="sidebar-panel">
       <div class="panel-title">Map Legend</div>
       <div class="legend-items">
         <div class="legend-item">
-          <div class="legend-swatch active"></div>
+          <div class="legend-swatch swatch-active"></div>
           Active fire perimeter
         </div>
         <div class="legend-item">
-          <div class="legend-swatch contained"></div>
+          <div class="legend-swatch swatch-contained"></div>
           Contained fire perimeter
         </div>
         <div class="legend-item">
-          <div class="legend-swatch station">▲</div>
-          Fire station (OSM)
+          <div style="width:18px; flex-shrink:0; font-size:13px; text-align:center; color:var(--ink-brown);">▲</div>
+          Fire station (OpenStreetMap)
         </div>
         <div class="legend-item">
-          <div style="width:18px; flex-shrink:0; border-top: 2px dashed var(--gap-line);"></div>
-          Fire &gt;25km from station
+          <div style="width:18px; flex-shrink:0; border-top:2px dashed var(--gold-dk); margin-top:5px;"></div>
+          Distance line (&gt;25 km gap)
         </div>
       </div>
     </div>
 
-    <!-- About -->
     <div class="sidebar-panel">
-      <div class="panel-title">About This Map</div>
-      <div style="font-size:11px; color:var(--ash); line-height:1.6;">
-        Data via <strong style="color:var(--parchment)">NIFC WFIGS API</strong>. Fire stations from OpenStreetMap. Updated automatically every morning at 6am Pacific via GitHub Actions.<br><br>
-        Oregon's eastern rangeland has a structural coverage gap unlike any neighboring state. <strong style="color:var(--fire)">30% of Oregon wildfires</strong> occur more than 50km from any mapped station — vs &lt;2% in CA and WA.
+      <div class="panel-title">About</div>
+      <div style="font-size:10px; color:var(--ink-gray); line-height:1.6;">
+        Fire perimeters from <strong style="color:var(--ink-brown)">NIFC WFIGS API</strong>. Stations from OpenStreetMap. Updated daily at 6am Pacific via GitHub Actions.<br><br>
+        Analysis by <strong style="color:var(--ink-brown)">B. Groves</strong> · <a href="https://github.com/bdgroves/wildfire-response-gaps" target="_blank" style="color:#8B1A1A;">wildfire-response-gaps</a>
       </div>
     </div>
+
+    <div id="error-box"></div>
 
     <div class="timestamp" id="timestamp">FETCHING LIVE DATA…</div>
   </aside>
@@ -721,488 +620,452 @@
   <!-- MAP -->
   <div id="map-container">
     <div id="loading">
-      <div class="loading-flame">🔥</div>
-      <div class="loading-text">Fetching fire data from WFIGS…</div>
+      <div style="font-size:42px;">🔥</div>
+      <div class="loading-text">Fetching fire perimeters from WFIGS…</div>
       <div class="loading-bar"><div class="loading-progress"></div></div>
     </div>
 
     <div id="map"></div>
 
-    <div id="map-title-overlay">
+    <div id="map-overlay">
       <h2>West Coast Wildfire Response Gap</h2>
-      <p>2026 Fire Season · NIFC WFIGS · Live YTD</p>
+      <p>2026 FIRE SEASON · NIFC WFIGS · LIVE YTD</p>
     </div>
 
     <div id="layer-toggle">
-      <button class="toggle-btn active" id="btn-fires" onclick="toggleLayer('fires')">🔥 Fires</button>
-      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Stations</button>
-      <button class="toggle-btn active" id="btn-gaps" onclick="toggleLayer('gaps')">- - Gap Lines</button>
+      <button class="toggle-btn active" id="btn-fires"    onclick="toggleLayer('fires')">🔥 Fire perimeters</button>
+      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Fire stations</button>
+      <button class="toggle-btn active" id="btn-gaps"     onclick="toggleLayer('gaps')">╌ Gap lines</button>
     </div>
   </div>
+
+</div>
+
+<!-- CAPTION BAR -->
+<div id="caption">
+  <span id="caption-text">DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations · Straight-line distances · Analysis by B. Groves</span>
 </div>
 
 <script>
-// ─────────────────────────────────────────
-// HISTORICAL BASELINES (from README analysis)
-// ─────────────────────────────────────────
+// =============================================================================
+// CONFIGURATION
+// =============================================================================
+
+// Esri Living Atlas — USA Wildfires v1
+// Layer 0: Current_Incidents (points) — IncidentName, DailyAcres, PercentContained, POOState
+// Layer 1: Current_Perimeters (polygons) — GISAcres, PercentContained, POOState, IncidentName
+const WFIGS_BASE = "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer";
+
+// Perimeters layer — matches your R pipeline's poly_ prefixed fields
+const PERIMETERS_URL = `${WFIGS_BASE}/1/query?` + new URLSearchParams({
+  where: "1=1",
+  outFields: "IncidentName,GISAcres,PercentContained,POOState,CreateDate,DateCurrent,FeatureCategory,FireDiscoveryDateTime",
+  geometry: "-124.8,32.5,-114.0,49.0",
+  geometryType: "esriGeometryEnvelope",
+  inSR: "4326",
+  spatialRel: "esriSpatialRelIntersects",
+  outSR: "4326",
+  f: "geojson",
+  resultRecordCount: "500"
+});
+
+// Incidents layer — for acreage fallback (matches attr_IncidentSize in your R code)
+const INCIDENTS_URL = `${WFIGS_BASE}/0/query?` + new URLSearchParams({
+  where: "1=1",
+  outFields: "IncidentName,DailyAcres,IncidentSize,PercentContained,POOState,UniqueFireIdentifier",
+  geometry: "-124.8,32.5,-114.0,49.0",
+  geometryType: "esriGeometryEnvelope",
+  inSR: "4326",
+  spatialRel: "esriSpatialRelIntersects",
+  outSR: "4326",
+  f: "geojson",
+  resultRecordCount: "500"
+});
+
+// Historical baselines from your R analysis
 const HIST = {
-  OR: { medianKm: 26.7, pctOver50: 30.1 },
-  CA: { medianKm: 10.8, pctOver50: 1.5  },
-  WA: { medianKm: 8.6,  pctOver50: 1.9  }
+  OR: { medianKm: 26.7, pctOver50: 30.1, color: "#8B1A1A" },
+  CA: { medianKm: 10.8, pctOver50: 1.5,  color: "#E67E22" },
+  WA: { medianKm: 8.6,  pctOver50: 1.9,  color: "#5C5C5C" }
 };
 
-// ─────────────────────────────────────────
-// KNOWN FIRE STATIONS (curated key stations)
-// ─────────────────────────────────────────
-const KNOWN_STATIONS = [
-  { name: "Frenchglen Fire Guard Station", lat: 42.814, lon: -118.934, note: "Nearest to 148 historical fires · Harney Co." },
-  { name: "Burns Interagency Fire Zone", lat: 43.587, lon: -119.054, note: "BLM Oregon" },
-  { name: "Lakeview BLM Fire Station", lat: 42.189, lon: -120.346, note: "Lake County" },
-  { name: "Vale BLM District", lat: 43.980, lon: -117.238, note: "Malheur County" },
-  { name: "Medford Air Tanker Base", lat: 42.374, lon: -122.874, note: "Southern Oregon" },
-  { name: "Redding Air Attack Base", lat: 40.509, lon: -122.293, note: "Northern California" },
-  { name: "Boise Interagency Fire Center", lat: 43.564, lon: -116.196, note: "NIFC HQ" },
-  { name: "Wenatchee Fire Station", lat: 47.423, lon: -120.310, note: "Central Washington" },
-  { name: "Yakima Fire Station #1", lat: 46.602, lon: -120.506, note: "Eastern Washington" },
-  { name: "Klamath Falls BLM", lat: 42.225, lon: -121.781, note: "OR/CA border" },
-  { name: "Susanville Cal Fire", lat: 40.416, lon: -120.652, note: "Lassen County CA" },
-  { name: "Fresno Cal Fire", lat: 36.737, lon: -119.771, note: "San Joaquin Valley" },
+// Key fire stations (curated — mirrors your R all_stations_wc_clean)
+const STATIONS = [
+  { name: "Frenchglen Fire Guard Station", lat: 42.814, lon: -118.934 },
+  { name: "Burns Interagency Fire Zone",   lat: 43.587, lon: -119.054 },
+  { name: "Lakeview BLM District",         lat: 42.189, lon: -120.346 },
+  { name: "Vale BLM District",             lat: 43.980, lon: -117.238 },
+  { name: "Hines Fire Station",            lat: 43.561, lon: -119.098 },
+  { name: "Lakeview Ranger District",      lat: 42.197, lon: -120.350 },
+  { name: "Medford Air Tanker Base",       lat: 42.374, lon: -122.874 },
+  { name: "Klamath Falls BLM",            lat: 42.225, lon: -121.781 },
+  { name: "Redding Air Attack Base",       lat: 40.509, lon: -122.293 },
+  { name: "Susanville Cal Fire",           lat: 40.416, lon: -120.652 },
+  { name: "Fresno Cal Fire",               lat: 36.737, lon: -119.771 },
+  { name: "Wenatchee Fire Station",        lat: 47.423, lon: -120.310 },
+  { name: "Yakima Fire Station",           lat: 46.602, lon: -120.506 },
+  { name: "Okanogan Fire Station",         lat: 48.362, lon: -119.573 },
+  { name: "Boise NIFC",                   lat: 43.564, lon: -116.196 },
 ];
 
-// ─────────────────────────────────────────
-// LEAFLET MAP INIT
-// ─────────────────────────────────────────
+// =============================================================================
+// MAP INIT
+// =============================================================================
 const map = L.map('map', {
-  center: [44.5, -119.5],
+  center: [44.0, -120.5],
   zoom: 6,
   zoomControl: true,
   attributionControl: true
 });
 
-// Dark map tiles
-const darkTile = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com">CARTO</a>',
-  subdomains: 'abcd',
-  maxZoom: 19
-});
-
-const topoTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-  attribution: '&copy; Esri, USGS, NOAA',
-  maxZoom: 19,
-  opacity: 0.85
-});
-
-darkTile.addTo(map);
-
-// State boundary highlight polygons (simplified bounding boxes for visual reference)
-const stateBoxes = [
-  { name: "Oregon",     coords: [[42.0,-124.6],[42.0,-116.5],[46.2,-116.5],[46.2,-124.6]] },
-  { name: "Washington", coords: [[45.5,-124.7],[45.5,-116.9],[49.0,-116.9],[49.0,-124.7]] },
-  { name: "California", coords: [[32.5,-124.4],[32.5,-114.1],[42.0,-114.1],[42.0,-124.4]] }
-];
-
-stateBoxes.forEach(s => {
-  L.polygon(s.coords, {
-    color: 'rgba(196,184,154,0.15)',
-    fillColor: 'transparent',
-    weight: 1,
-    dashArray: '4 6'
-  }).bindTooltip(s.name, {
-    permanent: false,
-    className: 'leaflet-tooltip',
-    direction: 'center'
-  }).addTo(map);
-});
+// Esri World Topo — matches the parchment aesthetic of your NatGeo R maps
+L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+  { attribution: '&copy; Esri, USGS, NOAA', maxZoom: 19, opacity: 0.9 }
+).addTo(map);
 
 // Layer groups
-const fireLayers  = L.layerGroup().addTo(map);
+const fireLayers    = L.layerGroup().addTo(map);
 const stationLayers = L.layerGroup().addTo(map);
-const gapLayers   = L.layerGroup().addTo(map);
-
-const layerState = { fires: true, stations: true, gaps: true };
+const gapLayers     = L.layerGroup().addTo(map);
+const labelLayers   = L.layerGroup().addTo(map);
+const layerState    = { fires: true, stations: true, gaps: true };
 
 function toggleLayer(name) {
   const btn = document.getElementById('btn-' + name);
+  const grp = name === 'fires' ? fireLayers : name === 'stations' ? stationLayers : gapLayers;
   if (layerState[name]) {
-    if (name === 'fires')    map.removeLayer(fireLayers);
-    if (name === 'stations') map.removeLayer(stationLayers);
-    if (name === 'gaps')     map.removeLayer(gapLayers);
+    map.removeLayer(grp);
+    if (name === 'fires') map.removeLayer(labelLayers);
     btn.classList.remove('active');
     layerState[name] = false;
   } else {
-    if (name === 'fires')    fireLayers.addTo(map);
-    if (name === 'stations') stationLayers.addTo(map);
-    if (name === 'gaps')     gapLayers.addTo(map);
+    grp.addTo(map);
+    if (name === 'fires') labelLayers.addTo(map);
     btn.classList.add('active');
     layerState[name] = true;
   }
 }
 
-// ─────────────────────────────────────────
+// =============================================================================
 // STATION MARKERS
-// ─────────────────────────────────────────
+// =============================================================================
 const stationIcon = L.divIcon({
   className: '',
-  html: `<div style="
-    color: #2A6496;
-    font-size: 14px;
-    line-height:1;
-    text-shadow: 0 0 6px rgba(42,100,150,0.8), 0 1px 3px rgba(0,0,0,0.8);
-    cursor: pointer;
-  ">▲</div>`,
-  iconSize: [14, 14],
-  iconAnchor: [7, 7]
+  html: `<div style="color:#3D2B1F;font-size:13px;line-height:1;
+    text-shadow:0 1px 3px rgba(255,255,255,0.8);cursor:pointer;">▲</div>`,
+  iconSize: [13,13], iconAnchor: [6,6]
 });
 
-KNOWN_STATIONS.forEach(s => {
-  const m = L.marker([s.lat, s.lon], { icon: stationIcon });
-  m.bindPopup(`
-    <div class="fire-popup">
+STATIONS.forEach(s => {
+  L.marker([s.lat, s.lon], { icon: stationIcon })
+    .bindPopup(`<div class="fire-popup">
       <h3>▲ ${s.name}</h3>
       <table>
-        <tr><td>Type</td><td>Fire Station / Air Base</td></tr>
-        <tr><td>Note</td><td>${s.note}</td></tr>
+        <tr><td>Type</td><td>Fire Station</td></tr>
         <tr><td>Coords</td><td>${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</td></tr>
       </table>
-    </div>
-  `);
-  stationLayers.addLayer(m);
+    </div>`)
+    .addTo(stationLayers);
 });
 
-// ─────────────────────────────────────────
-// LIVE FIRE DATA — WFIGS API
-// ─────────────────────────────────────────
-const WFIGS_URL = `https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/CY_WildlandFire_Perimeters_ToDate/FeatureServer/0/query?where=1%3D1&outFields=IncidentName,GISAcres,IncidentTypeCategory,CreateDate,DateCurrent,FeatureCategory,POOState&geometry=-125,32,-110,50&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outSR=4326&f=geojson&resultRecordCount=200`;
-
-async function loadFireData() {
-  try {
-    const res = await fetch(WFIGS_URL);
-    if (!res.ok) throw new Error('API error');
-    const data = await res.json();
-    processFireData(data);
-  } catch (err) {
-    console.warn('WFIGS fetch failed, using demo data:', err);
-    loadDemoData();
-  }
-}
-
+// =============================================================================
+// HAVERSINE — matches your R dist_nearest_km straight-line logic
+// =============================================================================
 function haversineKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function nearestStation(lat, lon) {
   let best = null, bestDist = Infinity;
-  KNOWN_STATIONS.forEach(s => {
+  STATIONS.forEach(s => {
     const d = haversineKm(lat, lon, s.lat, s.lon);
     if (d < bestDist) { bestDist = d; best = s; }
   });
   return { station: best, distKm: bestDist };
 }
 
-function centroid(coords) {
-  // flatten rings/multi
-  let pts = [];
+// geometry centroid
+function centroid(geometry) {
+  const pts = [];
   function collect(arr) {
     if (typeof arr[0] === 'number') { pts.push(arr); return; }
     arr.forEach(collect);
   }
-  collect(coords);
+  collect(geometry.coordinates);
   const lat = pts.reduce((s,p) => s + p[1], 0) / pts.length;
   const lon = pts.reduce((s,p) => s + p[0], 0) / pts.length;
   return [lat, lon];
 }
 
-function stateFromCode(code) {
-  const map = { US_OR: 'OR', US_CA: 'CA', US_WA: 'WA', OR: 'OR', CA: 'CA', WA: 'WA' };
-  return map[code] || 'Other';
+function fmtAcres(x) {
+  if (!x || x <= 0) return '—';
+  if (x >= 1000) return (x/1000).toFixed(1) + 'k';
+  return Math.round(x).toLocaleString();
 }
 
-function processFireData(geojson) {
+function fmtState(code) {
+  // matches your R case_when for attr_POOState
+  const m = { 'US-OR':'Oregon','US-CA':'California','US-WA':'Washington',
+               'US_OR':'Oregon','US_CA':'California','US_WA':'Washington',
+               'OR':'Oregon','CA':'California','WA':'Washington' };
+  return m[code] || code || '—';
+}
+
+// =============================================================================
+// PROCESS FIRE DATA
+// matches your R pipeline:
+//   acres = coalesce(na_if(attr_IncidentSize, 0), poly_GISAcres, 0)
+//   is_active = is.na(attr_PercentContained) | attr_PercentContained < 100
+// =============================================================================
+function processFeatures(geojson, incidentSizeMap) {
   fireLayers.clearLayers();
   gapLayers.clearLayers();
+  labelLayers.clearLayers();
 
-  const fires = geojson.features || [];
+  const features = geojson.features || [];
+  if (features.length === 0) {
+    showError("No fire perimeters returned. This is expected early in the season (Feb–May) when few fires have mapped perimeters.");
+    hideLoading();
+    updateHeader(0, 0, 0, 0, 0, 0);
+    return;
+  }
+
+  // Sort by acres desc for labeling (mirrors your arrange(desc(acres)))
+  features.sort((a, b) => {
+    const aA = bestAcres(a.properties, incidentSizeMap);
+    const bA = bestAcres(b.properties, incidentSizeMap);
+    return bA - aA;
+  });
+
   let totalAcres = 0, activeCount = 0, containedCount = 0;
-  let distances = [], over50 = 0;
+  const distances = [];
+  let over50 = 0;
 
-  // Sort by acres desc for labeling top fires
-  fires.sort((a, b) => (b.properties.GISAcres || 0) - (a.properties.GISAcres || 0));
-
-  fires.forEach((f, idx) => {
+  features.forEach((f, idx) => {
     const p = f.properties;
-    const acres = p.GISAcres || 0;
-    const name  = p.IncidentName || 'Unknown Fire';
-    const cat   = (p.FeatureCategory || '').toLowerCase();
-    const isActive = cat.includes('active') || cat.includes('current') || !cat.includes('contain');
-    const state = stateFromCode(p.POOState || '');
+
+    // Acreage: coalesce(IncidentSize, GISAcres, 0) — mirrors R pipeline
+    const acres = bestAcres(p, incidentSizeMap);
+
+    // Active logic: is.na(PercentContained) | PercentContained < 100
+    const pct = p.PercentContained;
+    const isActive = (pct === null || pct === undefined || pct < 100);
+
+    const stateName = fmtState(p.POOState);
 
     totalAcres += acres;
     if (isActive) activeCount++; else containedCount++;
 
-    const fillColor = isActive ? 'rgba(232,69,10,0.55)' : 'rgba(58,140,78,0.4)';
-    const borderColor = isActive ? '#E8450A' : '#3A8C4E';
+    // Centroid for distance calculation
+    let cLat, cLon;
+    try {
+      [cLat, cLon] = centroid(f.geometry);
+    } catch(e) { return; }
+
+    const { station, distKm } = nearestStation(cLat, cLon);
+    distances.push(distKm);
+    if (distKm > 50) over50++;
+
+    // Response time estimate (~1.07 min/km at road speed, rough)
+    const respMin = Math.round(distKm * 1.07);
+
+    const fillColor  = isActive ? 'rgba(139,26,26,0.45)' : 'rgba(91,126,94,0.35)';
+    const lineColor  = isActive ? '#8B1A1A' : '#3D5C3F';
+    const lineWeight = isActive ? 1.5 : 1;
 
     let poly;
     try {
-      poly = L.geoJSON(f.geometry, {
+      poly = L.geoJSON(f, {
         style: {
-          color: borderColor,
+          color: lineColor,
           fillColor,
-          weight: isActive ? 1.5 : 1,
+          weight: lineWeight,
           fillOpacity: 1,
           opacity: 0.9
         }
       });
     } catch(e) { return; }
 
-    // Centroid for distance calc
-    const [cLat, cLon] = centroid(f.geometry.coordinates);
-    const { station, distKm } = nearestStation(cLat, cLon);
-    distances.push(distKm);
-    if (distKm > 50) over50++;
+    const incName = p.IncidentName || 'Unknown Fire';
+    const dateStr = p.DateCurrent
+      ? new Date(p.DateCurrent).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+      : (p.CreateDate ? new Date(p.CreateDate).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '—');
 
-    // Popup
-    const dateStr = p.DateCurrent ? new Date(p.DateCurrent).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '—';
-    const responseMin = Math.round(distKm * 1.07);
-
-    poly.bindPopup(`
-      <div class="fire-popup">
-        <h3>${name}</h3>
-        <table>
-          <tr><td>Acres</td><td>${acres.toLocaleString()}</td></tr>
-          <tr><td>State</td><td>${state || '—'}</td></tr>
-          <tr><td>Updated</td><td>${dateStr}</td></tr>
-          <tr><td>Nearest station</td><td>${station ? station.name.split(' ').slice(0,2).join(' ') : '—'}</td></tr>
-          <tr><td>Distance</td><td>${distKm.toFixed(1)} km</td></tr>
-          <tr><td>Est. response</td><td>~${responseMin} min</td></tr>
-        </table>
-        <span class="badge ${isActive ? 'badge-active' : 'badge-contained'}">${isActive ? 'Active' : 'Contained'}</span>
-      </div>
-    `);
+    poly.bindPopup(`<div class="fire-popup">
+      <h3>${incName}</h3>
+      <table>
+        <tr><td>Acres</td><td>${acres > 0 ? acres.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'}</td></tr>
+        <tr><td>State</td><td>${stateName}</td></tr>
+        <tr><td>% Contained</td><td>${pct !== null && pct !== undefined ? pct + '%' : 'Unknown'}</td></tr>
+        <tr><td>Updated</td><td>${dateStr}</td></tr>
+        <tr><td>Nearest station</td><td>${station ? station.name.split(' ').slice(0,3).join(' ') : '—'}</td></tr>
+        <tr><td>Distance (straight-line)</td><td>${distKm.toFixed(1)} km</td></tr>
+        <tr><td>Est. response time</td><td>~${respMin} min</td></tr>
+      </table>
+      <span class="popup-badge ${isActive ? 'badge-active' : 'badge-contained'}">${isActive ? 'Active' : 'Contained'}</span>
+    </div>`);
 
     fireLayers.addLayer(poly);
 
-    // Gap line for fires >25km
+    // Dashed connector line for fires >25km — mirrors your isolated_lines in R
     if (distKm > 25 && station) {
-      const line = L.polyline([[cLat, cLon], [station.lat, station.lon]], {
-        color: '#FF7B2E',
-        weight: 1,
-        dashArray: '4 6',
-        opacity: 0.5
-      });
-      gapLayers.addLayer(line);
+      gapLayers.addLayer(L.polyline(
+        [[cLat, cLon], [station.lat, station.lon]],
+        { color: '#E8B800', weight: 1, dashArray: '4 6', opacity: 0.55 }
+      ));
     }
 
-    // Label top 10 fires by acres
-    if (idx < 10 && acres > 100) {
-      const label = L.marker([cLat, cLon], {
+    // Labels for top 10 fires by acres — mirrors your n_label = min(10, n_total)
+    if (idx < 10 && acres > 0) {
+      const acLabel = acres >= 1000 ? (acres/1000).toFixed(1) + 'k ac' : Math.round(acres) + ' ac';
+      labelLayers.addLayer(L.marker([cLat, cLon], {
         icon: L.divIcon({
           className: '',
           html: `<div style="
-            background: rgba(26,23,18,0.82);
-            border: 1px solid ${borderColor};
-            border-left: 2px solid ${borderColor};
-            color: #F2EBD9;
-            font-family: 'Source Code Pro', monospace;
-            font-size: 9px;
-            padding: 3px 6px;
-            white-space: nowrap;
-            pointer-events: none;
-            line-height: 1.4;
+            background:rgba(245,240,225,0.92);
+            border:1px solid ${lineColor};
+            border-left:2px solid ${lineColor};
+            color:${isActive ? '#8B1A1A' : '#3D5C3F'};
+            font-family:'Source Code Pro',monospace;
+            font-size:8px;
+            padding:2px 5px;
+            white-space:nowrap;
+            pointer-events:none;
+            line-height:1.4;
+            box-shadow:0 1px 4px rgba(0,0,0,0.15);
           ">
-            <strong>${name.length > 18 ? name.slice(0,18) + '…' : name}</strong><br>
-            ${acres >= 1000 ? (acres/1000).toFixed(1) + 'k ac' : Math.round(acres) + ' ac'}
+            <strong>${incName.length > 20 ? incName.slice(0,20) + '…' : incName}</strong><br>
+            ${acLabel}${isActive ? ' · ACTIVE' : ''}
           </div>`,
           iconAnchor: [0, 0]
         }),
         interactive: false
-      });
-      fireLayers.addLayer(label);
+      }));
     }
   });
 
-  // ── Update stats ──
-  const fireCount = fires.length;
-  const medianDist = distances.length ? distances.sort((a,b)=>a-b)[Math.floor(distances.length/2)] : 0;
+  // ── Update all stats ──
+  const medianDist = distances.length
+    ? [...distances].sort((a,b)=>a-b)[Math.floor(distances.length/2)]
+    : 0;
   const farPct = distances.length ? (over50 / distances.length * 100) : 0;
+  const now = new Date().toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
-  document.getElementById('hdr-fires').textContent = fireCount;
-  document.getElementById('hdr-acres').textContent = totalAcres >= 1000 ? (totalAcres/1000).toFixed(1) + 'k' : Math.round(totalAcres).toLocaleString();
-  document.getElementById('hdr-active').textContent = activeCount;
+  updateHeader(features.length, activeCount, containedCount, totalAcres, medianDist, farPct);
 
-  document.getElementById('sb-fires').textContent = fireCount;
-  document.getElementById('sb-acres').textContent = totalAcres >= 1000 ? (totalAcres/1000).toFixed(0) + 'k' : Math.round(totalAcres).toLocaleString();
-  document.getElementById('sb-active').textContent = activeCount;
+  document.getElementById('sb-fires').textContent     = features.length;
+  document.getElementById('sb-acres').textContent     = fmtAcres(totalAcres);
+  document.getElementById('sb-active').textContent    = activeCount;
   document.getElementById('sb-contained').textContent = containedCount;
-  document.getElementById('sb-updated').textContent = new Date().toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  document.getElementById('sb-updated').textContent   = now;
+  document.getElementById('sb-median').textContent    = medianDist.toFixed(1) + ' km';
+  document.getElementById('sb-pct50').textContent     = farPct.toFixed(1) + '%';
+  document.getElementById('gap-label').textContent    = farPct.toFixed(1) + '%';
+  document.getElementById('gap-fill').style.width     = Math.min(farPct * 2.5, 100) + '%';
+  document.getElementById('timestamp').textContent    =
+    `DATA: NIFC WFIGS · FETCHED ${now} · ${features.length} PERIMETERS`;
 
-  document.getElementById('sb-median-dist').textContent = medianDist.toFixed(1) + ' km';
-  document.getElementById('sb-far-pct').textContent = farPct.toFixed(1) + '%';
-  document.getElementById('sb-gap-label').textContent = farPct.toFixed(1) + '%';
-  document.getElementById('gap-fill').style.width = Math.min(farPct * 2, 100) + '%';
+  document.getElementById('subtitle-text').textContent =
+    `${features.length.toLocaleString()} fire perimeters across California, Oregon, and Washington as of ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}. ` +
+    `${activeCount} fires remain active. Median distance to nearest station: ${medianDist.toFixed(1)} km.`;
 
-  // State distances (use historical baselines, as we can't split by state without API field)
-  document.getElementById('or-dist').textContent = HIST.OR.medianKm + ' km';
-  document.getElementById('ca-dist').textContent = HIST.CA.medianKm + ' km';
-  document.getElementById('wa-dist').textContent = HIST.WA.medianKm + ' km';
+  document.getElementById('caption-text').textContent =
+    `DATA: NIFC WFIGS YTD Perimeters + OpenStreetMap fire stations  |  All perimeter types  |  Straight-line distances  |  ` +
+    `Acreage: best of IncidentSize / GISAcres  |  Analysis by B. Groves  |  ${now}`;
 
-  const maxDist = HIST.OR.medianKm;
-  document.getElementById('ca-bar').style.width = (HIST.CA.medianKm / maxDist * 100) + '%';
-  document.getElementById('wa-bar').style.width = (HIST.WA.medianKm / maxDist * 100) + '%';
-
-  document.getElementById('timestamp').textContent =
-    `DATA: NIFC WFIGS API · FETCHED ${new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})} · ${fireCount} FEATURES`;
-
-  // Fit map if fires found
-  if (fires.length > 0) {
+  // Fit bounds to fires
+  if (fireLayers.getLayers().length > 0) {
     try {
-      const allLayers = fireLayers.getLayers().filter(l => l.getBounds);
-      if (allLayers.length) {
-        const bounds = allLayers.reduce((b, l) => {
+      const bounds = fireLayers.getLayers()
+        .filter(l => l.getBounds)
+        .reduce((b, l) => {
           try { return b ? b.extend(l.getBounds()) : l.getBounds(); } catch(e) { return b; }
         }, null);
-        if (bounds) map.fitBounds(bounds, { padding: [40, 40] });
-      }
+      if (bounds) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
     } catch(e) {}
   }
 
   hideLoading();
 }
 
-// ─────────────────────────────────────────
-// DEMO DATA (if API unavailable)
-// ─────────────────────────────────────────
-function loadDemoData() {
-  const DEMO_FIRES = [
-    { name: "Frenchglen Complex", lat: 42.85, lon: -118.7,  acres: 51200, active: true,  state: 'OR' },
-    { name: "Malheur Rangeland", lat: 43.20, lon: -117.8,  acres: 28400, active: true,  state: 'OR' },
-    { name: "Burns North",       lat: 43.75, lon: -119.20, acres: 8900,  active: false, state: 'OR' },
-    { name: "Lakeview West",     lat: 42.20, lon: -120.50, acres: 4200,  active: true,  state: 'OR' },
-    { name: "Harney South",      lat: 42.50, lon: -118.20, acres: 15700, active: true,  state: 'OR' },
-    { name: "Klamath Hills",     lat: 42.28, lon: -122.10, acres: 1200,  active: false, state: 'OR' },
-    { name: "Shasta Pass",       lat: 41.20, lon: -121.90, acres: 3100,  active: true,  state: 'CA' },
-    { name: "Siskiyou Ridge",    lat: 41.80, lon: -122.60, acres: 890,   active: false, state: 'CA' },
-    { name: "Entiat Slopes",     lat: 47.65, lon: -120.30, acres: 2200,  active: true,  state: 'WA' },
-    { name: "Methow Lightning",  lat: 48.30, lon: -120.10, acres: 1500,  active: true,  state: 'WA' },
-  ];
+function bestAcres(props, incidentSizeMap) {
+  // coalesce(na_if(IncidentSize, 0), GISAcres, 0) — R logic
+  const incName = props.IncidentName || '';
+  const incSize = incidentSizeMap[incName] || null;
+  const gisAcres = props.GISAcres || 0;
+  if (incSize && incSize > 0) return incSize;
+  if (gisAcres > 0) return gisAcres;
+  return 0;
+}
 
-  fireLayers.clearLayers();
-  gapLayers.clearLayers();
+function updateHeader(fires, active, contained, acres, median, farPct) {
+  document.getElementById('hdr-fires').textContent     = fires.toLocaleString();
+  document.getElementById('hdr-active').textContent    = active;
+  document.getElementById('hdr-contained').textContent = contained;
+  document.getElementById('hdr-acres').textContent     = fmtAcres(acres);
+}
 
-  let totalAcres = 0, activeCount = 0, containedCount = 0;
-  let distances = [], over50 = 0;
-
-  DEMO_FIRES.forEach((f, idx) => {
-    totalAcres += f.acres;
-    if (f.active) activeCount++; else containedCount++;
-
-    const { station, distKm } = nearestStation(f.lat, f.lon);
-    distances.push(distKm);
-    if (distKm > 50) over50++;
-
-    const sz = Math.sqrt(f.acres) * 0.008;
-    const bounds = [[f.lat - sz, f.lon - sz*1.4], [f.lat + sz, f.lon + sz*1.4]];
-    const fillColor = f.active ? 'rgba(232,69,10,0.55)' : 'rgba(58,140,78,0.4)';
-    const borderColor = f.active ? '#E8450A' : '#3A8C4E';
-    const responseMin = Math.round(distKm * 1.07);
-
-    const rect = L.rectangle(bounds, {
-      color: borderColor,
-      fillColor,
-      weight: f.active ? 1.5 : 1,
-      fillOpacity: 1,
-      opacity: 0.9
-    });
-
-    rect.bindPopup(`
-      <div class="fire-popup">
-        <h3>${f.name}</h3>
-        <table>
-          <tr><td>Acres</td><td>${f.acres.toLocaleString()}</td></tr>
-          <tr><td>State</td><td>${f.state}</td></tr>
-          <tr><td>Nearest station</td><td>${station ? station.name.split(' ').slice(0,2).join(' ') : '—'}</td></tr>
-          <tr><td>Distance</td><td>${distKm.toFixed(1)} km</td></tr>
-          <tr><td>Est. response</td><td>~${responseMin} min</td></tr>
-        </table>
-        <span class="badge ${f.active ? 'badge-active' : 'badge-contained'}">${f.active ? 'Active' : 'Contained'}</span>
-      </div>
-    `);
-
-    fireLayers.addLayer(rect);
-
-    if (distKm > 25 && station) {
-      const cLat = f.lat, cLon = f.lon;
-      const line = L.polyline([[cLat, cLon], [station.lat, station.lon]], {
-        color: '#FF7B2E', weight: 1, dashArray: '4 6', opacity: 0.5
+// =============================================================================
+// FETCH DATA
+// =============================================================================
+async function loadData() {
+  // First fetch incidents for IncidentSize (attr_IncidentSize in your R code)
+  let incidentSizeMap = {};
+  try {
+    const incRes = await fetch(INCIDENTS_URL);
+    if (incRes.ok) {
+      const incData = await incRes.json();
+      (incData.features || []).forEach(f => {
+        const p = f.properties;
+        const name = p.IncidentName || '';
+        const sz = p.IncidentSize || p.DailyAcres || 0;
+        if (name && sz > 0) incidentSizeMap[name] = sz;
       });
-      gapLayers.addLayer(line);
     }
+  } catch(e) {
+    console.warn('Incident size fetch failed (non-fatal):', e);
+  }
 
-    const label = L.marker([f.lat, f.lon], {
-      icon: L.divIcon({
-        className: '',
-        html: `<div style="
-          background: rgba(26,23,18,0.82);
-          border: 1px solid ${borderColor};
-          border-left: 2px solid ${borderColor};
-          color: #F2EBD9;
-          font-family: 'Source Code Pro', monospace;
-          font-size: 9px;
-          padding: 3px 6px;
-          white-space: nowrap;
-          pointer-events: none;
-          line-height: 1.4;
-        ">
-          <strong>${f.name}</strong><br>
-          ${f.acres >= 1000 ? (f.acres/1000).toFixed(1) + 'k ac' : f.acres + ' ac'}
-        </div>`,
-        iconAnchor: [0, 0]
-      }),
-      interactive: false
-    });
-    fireLayers.addLayer(label);
-  });
+  // Then fetch perimeters (poly_ fields in your R code)
+  try {
+    const res = await fetch(PERIMETERS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    processFeatures(data, incidentSizeMap);
+  } catch(err) {
+    console.error('WFIGS perimeters fetch failed:', err);
+    showError(
+      `Could not fetch live perimeters from WFIGS API.<br><br>` +
+      `<strong>Likely cause:</strong> CORS restriction — the browser is blocking the cross-origin request. ` +
+      `This is normal when viewing locally.<br><br>` +
+      `<strong>Fix:</strong> Add a <code>fires.geojson</code> export to your GitHub Actions workflow ` +
+      `and point this page to <code>./fires.geojson</code> instead — same origin, no CORS issue.`
+    );
+    hideLoading();
+    updateHeader(0, 0, 0, 0, 0, 0);
+    document.getElementById('subtitle-text').textContent =
+      'Could not load live data — see sidebar for details.';
+  }
+}
 
-  const fireCount = DEMO_FIRES.length;
-  const medianDist = distances.sort((a,b)=>a-b)[Math.floor(distances.length/2)];
-  const farPct = over50 / distances.length * 100;
-
-  document.getElementById('hdr-fires').textContent = fireCount;
-  document.getElementById('hdr-acres').textContent = (totalAcres/1000).toFixed(0) + 'k';
-  document.getElementById('hdr-active').textContent = activeCount;
-  document.getElementById('sb-fires').textContent = fireCount;
-  document.getElementById('sb-acres').textContent = (totalAcres/1000).toFixed(0) + 'k';
-  document.getElementById('sb-active').textContent = activeCount;
-  document.getElementById('sb-contained').textContent = containedCount;
-  document.getElementById('sb-updated').textContent = new Date().toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'}) + ' (demo)';
-  document.getElementById('sb-median-dist').textContent = medianDist.toFixed(1) + ' km';
-  document.getElementById('sb-far-pct').textContent = farPct.toFixed(1) + '%';
-  document.getElementById('sb-gap-label').textContent = farPct.toFixed(1) + '%';
-  document.getElementById('gap-fill').style.width = Math.min(farPct * 2, 100) + '%';
-  document.getElementById('or-dist').textContent = HIST.OR.medianKm + ' km';
-  document.getElementById('ca-dist').textContent = HIST.CA.medianKm + ' km';
-  document.getElementById('wa-dist').textContent = HIST.WA.medianKm + ' km';
-  const maxDist = HIST.OR.medianKm;
-  document.getElementById('ca-bar').style.width = (HIST.CA.medianKm / maxDist * 100) + '%';
-  document.getElementById('wa-bar').style.width = (HIST.WA.medianKm / maxDist * 100) + '%';
-  document.getElementById('timestamp').textContent = `DEMO MODE · LIVE WFIGS DATA UNAVAILABLE IN THIS ENV · ${fireCount} FIRES SHOWN`;
-
-  map.setView([44.5, -119.5], 6);
-  hideLoading();
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.innerHTML = `⚠ ${msg}`;
+  box.style.display = 'block';
 }
 
 function hideLoading() {
   document.getElementById('loading').classList.add('hidden');
 }
 
-// ─────────────────────────────────────────
-// BOOT
-// ─────────────────────────────────────────
-loadFireData();
+// Boot
+loadData();
 </script>
 </body>
 </html>
