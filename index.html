@@ -833,6 +833,17 @@ function processFeatures(geojson) {
 
     fireLayers.addLayer(poly);
 
+    // For very small fires (< 1 acre) also add a dot marker so they're visible at any zoom
+    if (acres < 1) {
+      fireLayers.addLayer(L.circleMarker([cLat, cLon], {
+        radius: 5,
+        color: lineColor,
+        fillColor,
+        weight: 1.5,
+        fillOpacity: 0.8
+      }).bindPopup(poly.getPopup ? poly.getPopup() : ''));
+    }
+
     if (finalDist > 25 && finalStn) {
       const stn = STATIONS.find(s => s.name === finalStn);
       if (stn) {
