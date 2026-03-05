@@ -7,9 +7,6 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -628,7 +625,7 @@
 
     <div id="layer-toggle">
       <button class="toggle-btn active" id="btn-fires"    onclick="toggleLayer('fires')">🔥 Fire perimeters</button>
-      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Stations (zoom in)</button>
+      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Fire stations</button>
       <button class="toggle-btn active" id="btn-gaps"     onclick="toggleLayer('gaps')">╌ Gap lines</button>
     </div>
   </div>
@@ -657,40 +654,13 @@ L.tileLayer(
 ).addTo(map);
 
 const fireLayers    = L.layerGroup().addTo(map);
-const stationLayers = L.markerClusterGroup({
-  maxClusterRadius: 40,
-  showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 12,
-  spiderfyOnMaxZoom: true,
-  iconCreateFunction: function(cluster) {
-    const count = cluster.getChildCount();
-    const size = count < 20 ? 28 : count < 100 ? 34 : 40;
-    return L.divIcon({
-      className: '',
-      html: `<div style="
-        width:${size}px; height:${size}px;
-        background: rgba(245,240,225,0.93);
-        border: 1.5px solid #3D2B1F;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'Source Code Pro', monospace;
-        font-size: ${count < 100 ? 10 : 9}px;
-        font-weight: 600;
-        color: #3D2B1F;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-        line-height: 1;">▲ ${count}</div>`,
-      iconSize: [size, size],
-      iconAnchor: [size/2, size/2]
-    });
-  }
-}).addTo(map);
+const stationLayers = L.layerGroup(); // not added to map yet — appears on zoom
 const gapLayers     = L.layerGroup().addTo(map);
 const labelLayers   = L.layerGroup().addTo(map);
 const layerState    = { fires: true, stations: true, gaps: true };
 
-// Only show stations when zoomed in enough to be useful
-const STATION_MIN_ZOOM = 8;
+// Stations only appear at zoom 9+ — no clusters, just individual markers
+const STATION_MIN_ZOOM = 9;
 map.on('zoomend', function() {
   if (!layerState.stations) return;
   if (map.getZoom() >= STATION_MIN_ZOOM) {
@@ -766,8 +736,9 @@ function centroid(geometry) {
 
 function fmtAcres(x) {
   if (!x || x <= 0) return '—';
-  if (x >= 1000) return (x/1000).toFixed(1) + 'k';
-  return Math.round(x).toLocaleString();
+  const rounded = Math.round(x);
+  if (rounded >= 1000) return (rounded/1000).toFixed(1) + 'k';
+  return rounded.toLocaleString();
 }
 
 // =============================================================================
