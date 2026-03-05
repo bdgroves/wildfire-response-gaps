@@ -2,6 +2,7 @@
 # GitHub Actions daily YTD update
 # Produces full NatGeo-style layout matching script 19
 # CI-safe: fetches everything live, no baseline RDS needed
+# OSM fallback: uses output/stations.json cache if OSM is down
 
 message("=== YTD CI Update Starting ===")
 message("Time: ", Sys.time())
@@ -29,7 +30,7 @@ dir.create(summary_dir, showWarnings = FALSE, recursive = TRUE)
 wc_crs <- 5070
 
 # ----------------------------------------------------------
-# 2. NatGeo design system — matches script 19 exactly
+# 2. NatGeo design system
 # ----------------------------------------------------------
 natgeo_yellow    <- "#FFCE00"
 natgeo_yellow_dk <- "#E8B800"
@@ -118,25 +119,22 @@ if (nrow(fires_raw) == 0) {
 }
 
 # ----------------------------------------------------------
-# 4. Fetch OSM fire stations
+# 4. Fetch OSM fire stations — with cache fallback
 # ----------------------------------------------------------
 message("Fetching OSM fire stations...")
 
 fetch_osm_stations <- function(state_bbox, timeout = 60) {
   query <- osmdata::opq(bbox = state_bbox, timeout = timeout) |>
     osmdata::add_osm_feature(key = "amenity", value = "fire_station")
-  
-  result <- tryCatch(
+  tryCatch(
     osmdata::osmdata_sf(query),
     error = function(e) {
       message("  OSM fetch error: ", e$message)
       NULL
     }
   )
-  result
 }
 
-# Bounding boxes for each state
 bboxes <- list(
   CA = c(-124.5, 32.5, -114.1, 42.0),
   OR = c(-124.6, 41.9, -116.5, 46.3),
@@ -153,34 +151,48 @@ for (state_code in names(bboxes)) {
       dplyr::select(osm_id, name, geometry) |>
       dplyr::mutate(state_code = state_code)
   }
-  Sys.sleep(2)  # be polite to OSM
+  Sys.sleep(2)
 }
 
 stations_raw <- dplyr::bind_rows(stations_list)
 message(sprintf("Total OSM stations: %d", nrow(stations_raw)))
 
-# Clean stations
-stations_clean <- stations_raw |>
-  dplyr::filter(!is.na(name), !sf::st_is_empty(geometry)) |>
-  dplyr::distinct(geometry, .keep_all = TRUE)
-
-message(sprintf("Clean stations: %d", nrow(stations_clean)))
+# ----------------------------------------------------------
+# OSM fallback: use Python's cached stations.json if OSM is down
+# ----------------------------------------------------------
+if (nrow(stations_raw) == 0 || !"name" %in% names(stations_raw)) {
+  message("OSM returned no usable data — trying output/stations.json cache...")
+  cache_path <- "output/stations.json"
+  if (file.exists(cache_path)) {
+    cache_df <- jsonlite::fromJSON(cache_path)
+    stations_clean <- sf::st_as_sf(
+      cache_df,
+      coords = c("lon", "lat"),
+      crs    = 4326
+    )
+    message(sprintf("Loaded %d stations from cache", nrow(stations_clean)))
+  } else {
+    stop("OSM fetch failed and no stations.json cache found — cannot compute distances")
+  }
+} else {
+  stations_clean <- stations_raw |>
+    dplyr::filter(!is.na(name), !sf::st_is_empty(geometry)) |>
+    dplyr::distinct(geometry, .keep_all = TRUE)
+  message(sprintf("Clean stations: %d", nrow(stations_clean)))
+}
 
 # ----------------------------------------------------------
 # 5. Project and compute distances
 # ----------------------------------------------------------
 message("Computing distances...")
 
-fires_proj    <- fires_raw    |> sf::st_make_valid() |>
-  sf::st_transform(wc_crs)
+fires_proj    <- fires_raw     |> sf::st_make_valid() |> sf::st_transform(wc_crs)
 stations_proj <- stations_clean |> sf::st_transform(wc_crs)
 
-# Distance from each fire perimeter edge to nearest station
-dist_matrix <- sf::st_distance(fires_proj, stations_proj)
-
-nearest_idx      <- apply(dist_matrix, 1, which.min)
-nearest_dist_m   <- apply(dist_matrix, 1, min)
-nearest_name     <- stations_clean$name[nearest_idx]
+dist_matrix    <- sf::st_distance(fires_proj, stations_proj)
+nearest_idx    <- apply(dist_matrix, 1, which.min)
+nearest_dist_m <- apply(dist_matrix, 1, min)
+nearest_name   <- stations_clean$name[nearest_idx]
 
 fires_with_dist <- fires_proj |>
   dplyr::mutate(
@@ -192,8 +204,7 @@ fires_with_dist <- fires_proj |>
       poly_GISAcres,
       0
     ),
-    is_active = is.na(attr_PercentContained) |
-      attr_PercentContained < 100,
+    is_active = is.na(attr_PercentContained) | attr_PercentContained < 100,
     status = dplyr::if_else(is_active, "Active", "Contained"),
     state = dplyr::case_when(
       attr_POOState == "US-CA" ~ "California",
@@ -223,11 +234,9 @@ season_stage <- dplyr::case_when(
 )
 
 message(sprintf("Total: %d fires | %d active | %s acres | median %.1f km",
-                n_total, n_active,
-                scales::comma(round(total_acres)), median_dist))
+                n_total, n_active, scales::comma(round(total_acres)), median_dist))
 message(sprintf("Season stage: %s", season_stage))
 
-# Per-state stats
 state_ytd_stats <- fires_with_dist |>
   sf::st_drop_geometry() |>
   dplyr::group_by(state) |>
@@ -241,7 +250,6 @@ state_ytd_stats <- fires_with_dist |>
   ) |>
   dplyr::arrange(dplyr::desc(n_fires))
 
-# Station burden
 if (n_total >= 10) {
   station_burden_ytd <- fires_with_dist |>
     sf::st_drop_geometry() |>
@@ -260,7 +268,7 @@ if (n_total >= 10) {
 }
 
 # ----------------------------------------------------------
-# 7. Prepare map layers — WGS84 for plotting
+# 7. Prepare map layers
 # ----------------------------------------------------------
 fires_4326    <- fires_with_dist |> sf::st_transform(4326)
 stations_4326 <- stations_clean  |> sf::st_transform(4326)
@@ -268,18 +276,15 @@ stations_4326 <- stations_clean  |> sf::st_transform(4326)
 states_bg <- sf::st_as_sf(
   maps::map("state",
             regions = c("california", "oregon", "washington"),
-            fill = TRUE, plot = FALSE
-  )
+            fill = TRUE, plot = FALSE)
 ) |> sf::st_transform(4326)
 
 counties_bg <- sf::st_as_sf(
   maps::map("county",
             regions = c("california", "oregon", "washington"),
-            fill = TRUE, plot = FALSE
-  )
+            fill = TRUE, plot = FALSE)
 ) |> sf::st_transform(4326)
 
-# Fire labels — top fires by acres
 n_label <- min(10, n_total)
 
 label_fires_sf <- fires_4326 |>
@@ -307,7 +312,6 @@ label_fires <- label_coords |>
     )
   )
 
-# Connector lines for isolated fires
 station_coords <- stations_4326 |>
   sf::st_coordinates() |>
   tibble::as_tibble() |>
@@ -330,7 +334,7 @@ state_labels <- tibble::tibble(
 )
 
 # ----------------------------------------------------------
-# 8. Main map — matches script 19 exactly
+# 8. Main map
 # ----------------------------------------------------------
 message("Building main map...")
 
@@ -353,7 +357,7 @@ main_map <- ggplot() +
       geom_segment(
         data = isolated_lines,
         aes(x = lon, y = lat, xend = stn_lon, yend = stn_lat),
-        color     = alpha(natgeo_yellow_dk, 0.4),
+        color = alpha(natgeo_yellow_dk, 0.4),
         linewidth = 0.3, linetype = "dashed"
       )
     }
@@ -379,16 +383,16 @@ main_map <- ggplot() +
     force_pull         = 0.3
   ) +
   geom_text(
-    data     = state_labels,
+    data   = state_labels,
     aes(x = lon, y = lat, label = NAME),
-    size     = 5, fontface = "bold",
-    family   = "serif", color = alpha(ink_brown, 0.5)
+    size   = 5, fontface = "bold",
+    family = "serif", color = alpha(ink_brown, 0.5)
   ) +
   ggspatial::annotation_scale(
-    location    = "bl", width_hint  = 0.15,
-    text_cex    = 0.65, text_family = "serif",
-    line_width  = 0.4,  height      = unit(0.12, "cm"),
-    pad_x       = unit(0.3, "cm"), pad_y = unit(0.3, "cm")
+    location   = "bl", width_hint  = 0.15,
+    text_cex   = 0.65, text_family = "serif",
+    line_width = 0.4,  height      = unit(0.12, "cm"),
+    pad_x      = unit(0.3, "cm"), pad_y = unit(0.3, "cm")
   ) +
   theme_natgeo() +
   coord_sf(xlim = c(-124.8, -114.0), ylim = c(32.5, 49.0), expand = FALSE)
@@ -414,25 +418,13 @@ inset_map <- ggplot() +
   coord_sf(xlim = c(-125, -104), ylim = c(31, 50))
 
 # ----------------------------------------------------------
-# 10. Stat panels — identical to script 19
+# 10. Stat panels
 # ----------------------------------------------------------
 acres_display <- dplyr::if_else(
   total_acres > 0,
   paste0(scales::comma(round(total_acres, 1)), " TOTAL ACRES"),
   "ACRES NOT YET REPORTED"
 )
-
-make_panel <- function(..., bg = parchment, border = ink_brown) {
-  ggplot() +
-    { list(...) } +
-    scale_x_continuous(limits = c(0, 1)) +
-    scale_y_continuous(limits = c(0, 1)) +
-    theme_void() +
-    theme(
-      plot.background = element_rect(fill = bg, color = border, linewidth = 0.4),
-      plot.margin     = margin(6, 6, 6, 6)
-    )
-}
 
 stat_overview <- ggplot() +
   annotate("text", x = 0.5, y = 0.93,
@@ -550,7 +542,7 @@ if (n_total >= 10) {
     ) |>
     dplyr::pull(line) |>
     paste(collapse = "\n\n")
-  
+
   stat_stations <- ggplot() +
     annotate("text", x = 0.5, y = 0.95,
              label = "MOST BURDENED STATIONS", size = 3.2,
@@ -662,7 +654,7 @@ caption_bar <- ggplot() +
   theme(plot.margin = margin(0, 0, 0, 0))
 
 # ----------------------------------------------------------
-# 12. Adaptive sidebar layout — matches script 19 exactly
+# 12. Adaptive sidebar layout
 # ----------------------------------------------------------
 message(sprintf("Assembling layout (%s season stage)...", season_stage))
 
@@ -707,8 +699,7 @@ ggsave(
   bg     = parchment
 )
 
-message(sprintf("Saved: %s (%.0f KB)", out_path,
-                file.size(out_path) / 1024))
+message(sprintf("Saved: %s (%.0f KB)", out_path, file.size(out_path) / 1024))
 
 # ----------------------------------------------------------
 # 14. Summary file
