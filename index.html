@@ -7,6 +7,9 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Code+Pro:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
@@ -654,7 +657,33 @@ L.tileLayer(
 ).addTo(map);
 
 const fireLayers    = L.layerGroup().addTo(map);
-const stationLayers = L.layerGroup().addTo(map);
+const stationLayers = L.markerClusterGroup({
+  maxClusterRadius: 40,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true,
+  disableClusteringAtZoom: 11,
+  iconCreateFunction: function(cluster) {
+    const count = cluster.getChildCount();
+    const size = count < 20 ? 28 : count < 100 ? 34 : 40;
+    return L.divIcon({
+      className: '',
+      html: `<div style="
+        width:${size}px; height:${size}px;
+        background: rgba(245,240,225,0.93);
+        border: 1.5px solid #3D2B1F;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'Source Code Pro', monospace;
+        font-size: ${count < 100 ? 10 : 9}px;
+        font-weight: 600;
+        color: #3D2B1F;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        line-height: 1;">▲ ${count}</div>`,
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2]
+    });
+  }
+}).addTo(map);
 const gapLayers     = L.layerGroup().addTo(map);
 const labelLayers   = L.layerGroup().addTo(map);
 const layerState    = { fires: true, stations: true, gaps: true };
