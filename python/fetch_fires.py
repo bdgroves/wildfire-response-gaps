@@ -4,14 +4,15 @@ fetch_fires.py
 Fetches YTD wildfire perimeters from NIFC WFIGS API and writes
 output/fires.geojson for the Leaflet web map (index.html).
 
-Mirrors the R pipeline field logic:
-  acres      = coalesce(IncidentSize, GISAcres, 0)
-  is_active  = PercentContained is None or PercentContained < 100
-  state      = mapped from POOState (US-OR, US-CA, US-WA)
-  dist_nearest_km = haversine to nearest known fire station
+Station data: queries OpenStreetMap Overpass API for all fire stations
+in CA, OR, WA — mirrors R/09_west_coast_stations.R exactly.
+Stations cached to output/stations.json to avoid re-querying OSM every run.
 
 Run locally:
   python python/fetch_fires.py
+
+  Force fresh OSM query (e.g. start of season):
+  python python/fetch_fires.py --refresh-stations
 
 GitHub Actions runs this every morning and commits the result.
 """
@@ -20,46 +21,42 @@ import json
 import math
 import os
 import sys
+import time
 from datetime import datetime, timezone
 
 import requests
 
 # =============================================================================
-# WFIGS API — same endpoints your R pipeline uses
+# WFIGS API — exact same endpoint as R/10_west_coast_perimeters.R
 # =============================================================================
-WFIGS_PERIMETERS = (
+WFIGS_URL = (
     "https://services3.arcgis.com/T4QMspbfLg3qTGWY/ArcGIS/rest/services/"
     "WFIGS_Interagency_Perimeters_YearToDate/FeatureServer/0/query"
 )
 
-WFIGS_INCIDENTS = (
-    "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/"
-    "WFIGS_Interagency_Perimeters_YTD/FeatureServer/0/query"
-)
-
-# West coast bounding box
-WC_BBOX = "-124.8,32.5,-114.0,49.0"
+# State filter — mirrors R pipeline exactly
+WC_STATE_FILTER = "attr_POOState IN ('US-CA','US-OR','US-WA')"
 
 # =============================================================================
-# FIRE STATIONS — mirrors your R all_stations_wc_clean
+# OSM OVERPASS — mirrors R/09_west_coast_stations.R
 # =============================================================================
-STATIONS = [
-    {"name": "Frenchglen Fire Guard Station", "lat": 42.814, "lon": -118.934},
-    {"name": "Burns Interagency Fire Zone",   "lat": 43.587, "lon": -119.054},
-    {"name": "Lakeview BLM District",         "lat": 42.189, "lon": -120.346},
-    {"name": "Vale BLM District",             "lat": 43.980, "lon": -117.238},
-    {"name": "Hines Fire Station",            "lat": 43.561, "lon": -119.098},
-    {"name": "Lakeview Ranger District",      "lat": 42.197, "lon": -120.350},
-    {"name": "Medford Air Tanker Base",       "lat": 42.374, "lon": -122.874},
-    {"name": "Klamath Falls BLM",            "lat": 42.225, "lon": -121.781},
-    {"name": "Redding Air Attack Base",       "lat": 40.509, "lon": -122.293},
-    {"name": "Susanville Cal Fire",           "lat": 40.416, "lon": -120.652},
-    {"name": "Fresno Cal Fire",               "lat": 36.737, "lon": -119.771},
-    {"name": "Wenatchee Fire Station",        "lat": 47.423, "lon": -120.310},
-    {"name": "Yakima Fire Station",           "lat": 46.602, "lon": -120.506},
-    {"name": "Okanogan Fire Station",         "lat": 48.362, "lon": -119.573},
-    {"name": "Boise NIFC",                   "lat": 43.564, "lon": -116.196},
-]
+OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+
+# Bounding boxes per state [south, west, north, east]
+# mirrors R's st_bbox(westcoast_states %>% filter(NAME == state_name))
+STATE_BBOXES = {
+    "California":  (32.5, -124.4, 42.0, -114.1),
+    "Oregon":      (41.9, -124.6, 46.3, -116.5),
+    "Washington":  (45.5, -124.7, 49.0, -116.9),
+}
+
+# Exclusions from R script manual review
+STATIONS_EXCLUDE = {
+    "Wallowa Lake Fire Station",
+    "Northeast Washington Interagency Communications Center",
+}
+
+STATIONS_CACHE = "output/stations.json"
 
 STATE_MAP = {
     "US-OR": "Oregon",  "US_OR": "Oregon",  "OR": "Oregon",
@@ -72,7 +69,6 @@ STATE_MAP = {
 # GEOMETRY HELPERS
 # =============================================================================
 def haversine_km(lat1, lon1, lat2, lon2):
-    """Straight-line distance in km — mirrors R dist_nearest_km logic."""
     R = 6371
     d_lat = math.radians(lat2 - lat1)
     d_lon = math.radians(lon2 - lon1)
@@ -83,10 +79,9 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
-def nearest_station(lat, lon):
-    """Return (station dict, distance_km) for the closest known station."""
+def nearest_station(lat, lon, stations):
     best, best_dist = None, float("inf")
-    for s in STATIONS:
+    for s in stations:
         d = haversine_km(lat, lon, s["lat"], s["lon"])
         if d < best_dist:
             best_dist = d
@@ -95,7 +90,6 @@ def nearest_station(lat, lon):
 
 
 def centroid(geometry):
-    """Approximate centroid from a GeoJSON geometry (Polygon or MultiPolygon)."""
     coords = []
 
     def collect(arr):
@@ -114,10 +108,106 @@ def centroid(geometry):
 
 
 # =============================================================================
-# FETCH
+# OSM STATION QUERY — mirrors R/09_west_coast_stations.R
+# Queries each state separately to avoid OSM timeouts (same as R)
+# Caches result to output/stations.json
+# =============================================================================
+def query_osm_stations_for_state(state_name, bbox, retries=2):
+    """
+    Query Overpass for fire_station amenities in one state bounding box.
+    mirrors R fetch_stations_for_state() including retry logic.
+    bbox = (south, west, north, east)
+    """
+    s, w, n, e = bbox
+    query = f"""
+[out:json][timeout:120];
+(
+  node["amenity"="fire_station"]({s},{w},{n},{e});
+  way["amenity"="fire_station"]({s},{w},{n},{e});
+  relation["amenity"="fire_station"]({s},{w},{n},{e});
+);
+out center;
+"""
+    for attempt in range(retries):
+        try:
+            resp = requests.post(OVERPASS_URL, data={"data": query}, timeout=130)
+            resp.raise_for_status()
+            data = resp.json()
+            stations = []
+            for el in data.get("elements", []):
+                name = el.get("tags", {}).get("name")
+                if not name:
+                    continue
+                if name in STATIONS_EXCLUDE:
+                    continue
+                # Points use lat/lon directly; ways/relations use center
+                if el["type"] == "node":
+                    lat, lon = el["lat"], el["lon"]
+                else:
+                    center = el.get("center", {})
+                    if not center:
+                        continue
+                    lat, lon = center["lat"], center["lon"]
+                stations.append({"name": name, "lat": lat, "lon": lon,
+                                  "state": state_name})
+            print(f"    {state_name}: {len(stations)} stations")
+            return stations
+        except Exception as exc:
+            print(f"    {state_name} attempt {attempt+1} failed: {exc}",
+                  file=sys.stderr)
+            if attempt < retries - 1:
+                print("    Retrying in 30 seconds...")
+                time.sleep(30)
+    print(f"    {state_name}: all attempts failed, returning empty",
+          file=sys.stderr)
+    return []
+
+
+def load_or_fetch_stations(force_refresh=False):
+    """
+    Load stations from cache or query OSM fresh.
+    mirrors R cache logic: query only runs once unless cache missing.
+    """
+    os.makedirs("output", exist_ok=True)
+
+    if not force_refresh and os.path.exists(STATIONS_CACHE):
+        with open(STATIONS_CACHE) as fh:
+            stations = json.load(fh)
+        print(f"  Stations loaded from cache: {len(stations)} "
+              f"({STATIONS_CACHE})")
+        return stations
+
+    print("  Querying OSM for fire stations across CA, OR, WA...")
+    print("  (This runs once and caches — mirrors R/09_west_coast_stations.R)")
+    all_stations = []
+    for state_name, bbox in STATE_BBOXES.items():
+        state_stations = query_osm_stations_for_state(state_name, bbox)
+        all_stations.extend(state_stations)
+        time.sleep(2)  # polite delay between state queries
+
+    # Deduplicate by name + approximate location
+    seen = set()
+    deduped = []
+    for s in all_stations:
+        key = (s["name"], round(s["lat"], 3), round(s["lon"], 3))
+        if key not in seen:
+            seen.add(key)
+            deduped.append(s)
+
+    print(f"  Total stations after dedup: {len(deduped)}")
+    print(f"  Excluded: {', '.join(STATIONS_EXCLUDE)}")
+
+    with open(STATIONS_CACHE, "w") as fh:
+        json.dump(deduped, fh, indent=2)
+    print(f"  Stations cached to {STATIONS_CACHE}")
+
+    return deduped
+
+
+# =============================================================================
+# WFIGS FETCH
 # =============================================================================
 def fetch_wfigs(url, params, label):
-    """GET a WFIGS FeatureServer query, return GeoJSON features list."""
     print(f"  Fetching {label}...")
     try:
         resp = requests.get(url, params=params, timeout=60)
@@ -136,32 +226,23 @@ def fetch_wfigs(url, params, label):
 
 def fetch_perimeters():
     params = {
-        "where": "1=1",
+        "where": WC_STATE_FILTER,
         "outFields": (
-            "IncidentName,GISAcres,IncidentSize,PercentContained,"
-            "POOState,CreateDate,DateCurrent,FeatureCategory"
+            "attr_IncidentName,poly_GISAcres,attr_IncidentSize,"
+            "attr_PercentContained,attr_POOState,"
+            "poly_DateCurrent,poly_CreateDate,poly_FeatureCategory"
         ),
-        "geometry": WC_BBOX,
-        "geometryType": "esriGeometryEnvelope",
-        "inSR": "4326",
-        "spatialRel": "esriSpatialRelIntersects",
         "outSR": "4326",
         "f": "geojson",
         "resultRecordCount": "1000",
     }
-    return fetch_wfigs(WFIGS_PERIMETERS, params, "WFIGS perimeters")
+    return fetch_wfigs(WFIGS_URL, params, "WFIGS YearToDate perimeters")
 
 
 # =============================================================================
-# PROCESS
+# PROCESS FEATURES
 # =============================================================================
-def process_features(raw_features):
-    """
-    Build enriched GeoJSON features with fields mirroring R pipeline:
-      acres, is_active, status, state,
-      dist_nearest_km, nearest_station_name,
-      attr_IncidentName, attr_PercentContained
-    """
+def process_features(raw_features, stations):
     out = []
 
     for f in raw_features:
@@ -170,32 +251,30 @@ def process_features(raw_features):
         if not geom:
             continue
 
-        # Centroid for distance calc
         c_lat, c_lon = centroid(geom)
         if c_lat is None:
             continue
 
-        # Acreage: coalesce(IncidentSize, GISAcres, 0) — mirrors R pipeline
-        inc_size  = props.get("IncidentSize") or 0
-        gis_acres = props.get("GISAcres") or 0
+        # Acreage: coalesce(attr_IncidentSize, poly_GISAcres, 0)
+        inc_size  = props.get("attr_IncidentSize") or 0
+        gis_acres = props.get("poly_GISAcres") or 0
         acres = inc_size if inc_size > 0 else (gis_acres if gis_acres > 0 else 0)
 
-        # Active logic: is.na(PercentContained) | PercentContained < 100
-        pct = props.get("PercentContained")
+        # Active: is.na(attr_PercentContained) | attr_PercentContained < 100
+        pct = props.get("attr_PercentContained")
         is_active = (pct is None or pct < 100)
 
         # State
-        state_code = props.get("POOState") or ""
+        state_code = props.get("attr_POOState") or ""
         state = STATE_MAP.get(state_code, state_code or "Other")
 
-        # Distance to nearest station
-        stn, dist_km = nearest_station(c_lat, c_lon)
+        # Distance to nearest OSM station
+        stn, dist_km = nearest_station(c_lat, c_lon, stations)
 
-        # Date string
-        date_current = props.get("DateCurrent") or props.get("CreateDate")
+        # Date
+        date_current = props.get("poly_DateCurrent") or props.get("poly_CreateDate")
         if date_current:
             try:
-                # WFIGS returns epoch ms
                 dt = datetime.fromtimestamp(date_current / 1000, tz=timezone.utc)
                 date_str = dt.strftime("%b %d, %Y")
             except Exception:
@@ -204,18 +283,16 @@ def process_features(raw_features):
             date_str = ""
 
         enriched_props = {
-            # R-pipeline-style fields consumed by index.html
-            "attr_IncidentName":      props.get("IncidentName") or "Unknown Fire",
-            "attr_PercentContained":  pct,
-            "acres":                  round(acres, 1),
-            "is_active":              is_active,
-            "status":                 "Active" if is_active else "Contained",
-            "state":                  state,
-            "dist_nearest_km":        round(dist_km, 2),
-            "nearest_station_name":   stn["name"] if stn else None,
-            # Extra context for popups
-            "date_current":           date_str,
-            "feature_category":       props.get("FeatureCategory") or "",
+            "attr_IncidentName":     props.get("attr_IncidentName") or "Unknown Fire",
+            "attr_PercentContained": pct,
+            "acres":                 round(acres, 1),
+            "is_active":             is_active,
+            "status":                "Active" if is_active else "Contained",
+            "state":                 state,
+            "dist_nearest_km":       round(dist_km, 2),
+            "nearest_station_name":  stn["name"] if stn else None,
+            "date_current":          date_str,
+            "feature_category":      props.get("poly_FeatureCategory") or "",
         }
 
         out.append({
@@ -224,7 +301,6 @@ def process_features(raw_features):
             "properties": enriched_props,
         })
 
-    # Sort by acres desc — mirrors R arrange(desc(acres))
     out.sort(key=lambda x: x["properties"]["acres"], reverse=True)
     return out
 
@@ -250,26 +326,43 @@ def print_summary(features):
     print(f"    Median dist:    {median_dist:.1f} km")
     print(f"    Fires >50 km:   {over_50} ({pct_over_50}%)")
 
-    # Write ytd_summary.txt for GitHub Actions commit message
-    summary_path = "output/ytd_fires_summary.txt"
     os.makedirs("output", exist_ok=True)
-    with open(summary_path, "w") as fh:
+    with open("output/ytd_fires_summary.txt", "w") as fh:
         fh.write(
             f"{n_total} fires, {n_active} active, "
             f"{total_acres:,.0f} ac, median {median_dist:.1f} km to station"
         )
-    print(f"  Summary written to {summary_path}")
+
+    # Print each fire with its nearest station
+    print(f"\n  Fires:")
+    for f in features:
+        p = f["properties"]
+        print(f"    {p['attr_IncidentName']:30s} | "
+              f"{p['acres']:>8.1f} ac | "
+              f"{p['state']:12s} | "
+              f"{p['dist_nearest_km']:6.1f} km to {p['nearest_station_name']}")
 
 
 # =============================================================================
 # MAIN
 # =============================================================================
 def main():
-    print(f"\n=== fetch_fires.py  {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} ===")
+    force_refresh = "--refresh-stations" in sys.argv
+
+    print(f"\n=== fetch_fires.py  "
+          f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} ===")
 
     os.makedirs("output", exist_ok=True)
 
-    # Fetch
+    # Step 1: Load or fetch OSM stations
+    print("\n--- Stations ---")
+    stations = load_or_fetch_stations(force_refresh=force_refresh)
+    if not stations:
+        print("  WARNING: No stations loaded — distances will be wrong",
+              file=sys.stderr)
+
+    # Step 2: Fetch WFIGS perimeters
+    print("\n--- Fire Perimeters ---")
     raw = fetch_perimeters()
 
     if not raw:
@@ -277,14 +370,13 @@ def main():
         print("  Writing empty fires.geojson so map loads cleanly.")
         geojson = {"type": "FeatureCollection", "features": []}
     else:
-        # Process
         print("\n  Processing features...")
-        features = process_features(raw)
+        features = process_features(raw, stations)
         print(f"  Processed {len(features)} valid features")
         print_summary(features)
         geojson = {"type": "FeatureCollection", "features": features}
 
-    # Write
+    # Step 3: Write GeoJSON
     out_path = "output/fires.geojson"
     with open(out_path, "w") as fh:
         json.dump(geojson, fh, separators=(",", ":"))
