@@ -637,25 +637,11 @@
 </div>
 
 <script>
-const GEOJSON_URL = './output/fires.geojson';
+const GEOJSON_URL   = './output/fires.geojson';
+const STATIONS_URL  = './output/stations.json';
 
-const STATIONS = [
-  { name: "Frenchglen Fire Guard Station", lat: 42.814, lon: -118.934 },
-  { name: "Burns Interagency Fire Zone",   lat: 43.587, lon: -119.054 },
-  { name: "Lakeview BLM District",         lat: 42.189, lon: -120.346 },
-  { name: "Vale BLM District",             lat: 43.980, lon: -117.238 },
-  { name: "Hines Fire Station",            lat: 43.561, lon: -119.098 },
-  { name: "Lakeview Ranger District",      lat: 42.197, lon: -120.350 },
-  { name: "Medford Air Tanker Base",       lat: 42.374, lon: -122.874 },
-  { name: "Klamath Falls BLM",            lat: 42.225, lon: -121.781 },
-  { name: "Redding Air Attack Base",       lat: 40.509, lon: -122.293 },
-  { name: "Susanville Cal Fire",           lat: 40.416, lon: -120.652 },
-  { name: "Fresno Cal Fire",               lat: 36.737, lon: -119.771 },
-  { name: "Wenatchee Fire Station",        lat: 47.423, lon: -120.310 },
-  { name: "Yakima Fire Station",           lat: 46.602, lon: -120.506 },
-  { name: "Okanogan Fire Station",         lat: 48.362, lon: -119.573 },
-  { name: "Boise NIFC",                   lat: 43.564, lon: -116.196 },
-];
+// Populated after stations.json loads
+let STATIONS = [];
 
 // =============================================================================
 // MAP INIT
@@ -690,25 +676,13 @@ function toggleLayer(name) {
 }
 
 // =============================================================================
-// STATION MARKERS — always rendered regardless of fire count
+// STATION MARKERS — rendered dynamically from output/stations.json
 // =============================================================================
 const stationIcon = L.divIcon({
   className: '',
   html: `<div style="color:#3D2B1F;font-size:13px;line-height:1;
     text-shadow:0 1px 3px rgba(255,255,255,0.8);cursor:pointer;">▲</div>`,
   iconSize: [13, 13], iconAnchor: [6, 6]
-});
-
-STATIONS.forEach(s => {
-  L.marker([s.lat, s.lon], { icon: stationIcon })
-    .bindPopup(`<div class="fire-popup">
-      <h3>▲ ${s.name}</h3>
-      <table>
-        <tr><td>Type</td><td>Fire Station</td></tr>
-        <tr><td>Coords</td><td>${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</td></tr>
-      </table>
-    </div>`)
-    .addTo(stationLayers);
 });
 
 // =============================================================================
@@ -916,12 +890,29 @@ function processFeatures(geojson) {
 // =============================================================================
 async function loadData() {
   try {
-    const res = await fetch(GEOJSON_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    // Fetch stations and fires in parallel
+    const [stationsRes, firesRes] = await Promise.all([
+      fetch(STATIONS_URL),
+      fetch(GEOJSON_URL)
+    ]);
+
+    // Load stations
+    if (stationsRes.ok) {
+      STATIONS = await stationsRes.json();
+      renderStations(STATIONS);
+      document.getElementById('subtitle-text').textContent =
+        `${STATIONS.length.toLocaleString()} fire stations loaded from OpenStreetMap.`;
+    } else {
+      console.warn('stations.json not available, map will show no stations');
+    }
+
+    // Load fires
+    if (!firesRes.ok) throw new Error(`HTTP ${firesRes.status}`);
+    const data = await firesRes.json();
     processFeatures(data);
+
   } catch(err) {
-    console.error('fires.geojson load failed:', err);
+    console.error('Load failed:', err);
     document.getElementById('error-box').innerHTML =
       `⚠ Could not load <code>output/fires.geojson</code>. ` +
       `This file is written by <code>python/fetch_fires.py</code> and committed by GitHub Actions each morning. ` +
@@ -931,6 +922,21 @@ async function loadData() {
       'Could not load fire data — see sidebar for details.';
     hideLoading();
   }
+}
+
+function renderStations(stations) {
+  stationLayers.clearLayers();
+  stations.forEach(s => {
+    L.marker([s.lat, s.lon], { icon: stationIcon })
+      .bindPopup(`<div class="fire-popup">
+        <h3>▲ ${s.name}</h3>
+        <table>
+          <tr><td>State</td><td>${s.state || '—'}</td></tr>
+          <tr><td>Coords</td><td>${s.lat.toFixed(3)}, ${s.lon.toFixed(3)}</td></tr>
+        </table>
+      </div>`)
+      .addTo(stationLayers);
+  });
 }
 
 function hideLoading() {
