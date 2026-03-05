@@ -628,7 +628,7 @@
 
     <div id="layer-toggle">
       <button class="toggle-btn active" id="btn-fires"    onclick="toggleLayer('fires')">🔥 Fire perimeters</button>
-      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Fire stations</button>
+      <button class="toggle-btn active" id="btn-stations" onclick="toggleLayer('stations')">▲ Stations (zoom in)</button>
       <button class="toggle-btn active" id="btn-gaps"     onclick="toggleLayer('gaps')">╌ Gap lines</button>
     </div>
   </div>
@@ -661,7 +661,8 @@ const stationLayers = L.markerClusterGroup({
   maxClusterRadius: 40,
   showCoverageOnHover: false,
   zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 11,
+  disableClusteringAtZoom: 12,
+  spiderfyOnMaxZoom: true,
   iconCreateFunction: function(cluster) {
     const count = cluster.getChildCount();
     const size = count < 20 ? 28 : count < 100 ? 34 : 40;
@@ -688,6 +689,17 @@ const gapLayers     = L.layerGroup().addTo(map);
 const labelLayers   = L.layerGroup().addTo(map);
 const layerState    = { fires: true, stations: true, gaps: true };
 
+// Only show stations when zoomed in enough to be useful
+const STATION_MIN_ZOOM = 8;
+map.on('zoomend', function() {
+  if (!layerState.stations) return;
+  if (map.getZoom() >= STATION_MIN_ZOOM) {
+    if (!map.hasLayer(stationLayers)) map.addLayer(stationLayers);
+  } else {
+    if (map.hasLayer(stationLayers)) map.removeLayer(stationLayers);
+  }
+});
+
 function toggleLayer(name) {
   const btn = document.getElementById('btn-' + name);
   const grp = name === 'fires' ? fireLayers : name === 'stations' ? stationLayers : gapLayers;
@@ -697,6 +709,12 @@ function toggleLayer(name) {
     btn.classList.remove('active');
     layerState[name] = false;
   } else {
+    // For stations, only add if zoomed in enough
+    if (name === 'stations' && map.getZoom() < STATION_MIN_ZOOM) {
+      btn.classList.add('active');
+      layerState[name] = true;
+      return; // will appear when user zooms in
+    }
     grp.addTo(map);
     if (name === 'fires') labelLayers.addTo(map);
     btn.classList.add('active');
