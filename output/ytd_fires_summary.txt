@@ -1,1 +1,1 @@
-193 fires, 178 active, 45,242 ac, median 7.7 km to station
+201 fires, 186 active, 44,883 ac, median 7.7 km to station
