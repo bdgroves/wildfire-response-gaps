@@ -165,6 +165,7 @@
   }
   .legend .active-swatch    { background: var(--fire-active); opacity: 0.7; }
   .legend .contained-swatch { background: var(--fire-contained); opacity: 0.55; }
+  .legend .rfpa-swatch      { background: #D9A94A; opacity: 0.45; border: 1px solid #8B6B26; }
   .legend .station-mark {
     display: inline-block;
     width: 0; height: 0;
@@ -243,10 +244,11 @@
   };
 
   // ---- Fetch data in parallel ----
-  const [summary, fires, stations] = await Promise.all([
+  const [summary, fires, stations, rfpa] = await Promise.all([
     fetch('output/ytd_summary.json').then(r => r.ok ? r.json() : null).catch(() => null),
     fetch('output/fires.geojson').then(r => r.ok ? r.json() : {features: []}).catch(() => ({features: []})),
     fetch('output/stations.json').then(r => r.ok ? r.json() : []).catch(() => []),
+    fetch('data/rfpa_boundaries.geojson').then(r => r.ok ? r.json() : null).catch(() => null),
   ]);
 
   const year = new Date().getFullYear();
@@ -275,6 +277,13 @@
     if (worst && worst.pct_over_50 > 15) {
       subtitle += ` <strong>${worst.state}</strong>: ${worst.pct_over_50}% of fires beyond 50 km.`;
     }
+    // If the RFPA analysis found gap fires that fall inside coverage, add the payoff line
+    const r = summary.rfpa;
+    if (r && r.or_gap_fires > 0) {
+      subtitle += ` Of those, <strong>${r.or_gap_in_rfpa} of ${r.or_gap_fires}</strong> ` +
+                  `Oregon fires beyond 50 km fall within Rangeland Fire Protection ` +
+                  `Association (RFPA) volunteer coverage.`;
+    }
     $('subtitle').innerHTML = subtitle;
   } else {
     $('kicker').textContent = 'Live data unavailable';
@@ -292,6 +301,31 @@
     subdomains: 'abcd',
     maxZoom: 18,
   }).addTo(map);
+
+  // ---- RFPA coverage (rangeland fire protection associations) ----
+  // Drawn under fires and stations so fire perimeters read clearly on top.
+  const rfpaLayer = L.geoJSON(rfpa, {
+    style: {
+      color: '#8B6B26',
+      weight: 0.8,
+      fillColor: '#D9A94A',
+      fillOpacity: 0.28,
+    },
+    onEachFeature: (f, layer) => {
+      const name = f.properties?.name || 'Unnamed RFPA';
+      const acres = f.properties?.acres;
+      layer.bindPopup(
+        `<h3>${name}</h3>` +
+        `<div class="popup-row"><span class="k">Type:</span> Volunteer rangeland coverage</div>` +
+        (acres ? `<div class="popup-row"><span class="k">Acres:</span> ${Math.round(acres).toLocaleString()}</div>` : '') +
+        `<div class="popup-row" style="margin-top:6px;font-size:11px;color:var(--ink-gray);">` +
+        `RFPAs are rancher-organized nonprofits that respond to fires in ` +
+        `remote rangeland with no traditional fire district coverage.</div>`,
+        { maxWidth: 280 }
+      );
+    },
+  });
+  if (rfpa && rfpa.features && rfpa.features.length) rfpaLayer.addTo(map);
 
   // ---- Stations (triangles) ----
   const stationsById = new Map();
@@ -367,18 +401,24 @@
   }
 
   // ---- Layer control + legend ----
-  L.control.layers(null, {
-    'Fire stations': stationsLayer,
-  }, { collapsed: false, position: 'topright' }).addTo(map);
+  const overlays = { 'Fire stations': stationsLayer };
+  if (rfpa && rfpa.features && rfpa.features.length) {
+    overlays['RFPA coverage'] = rfpaLayer;
+  }
+  L.control.layers(null, overlays, { collapsed: false, position: 'topright' }).addTo(map);
 
   const legend = L.control({ position: 'bottomleft' });
   legend.onAdd = function() {
     const div = L.DomUtil.create('div', 'legend');
-    div.innerHTML = `
+    let html = `
       <div><span class="swatch active-swatch"></span>Active fire</div>
       <div><span class="swatch contained-swatch"></span>Contained</div>
       <div><span class="station-mark"></span>Fire station</div>
     `;
+    if (rfpa && rfpa.features && rfpa.features.length) {
+      html += `<div><span class="swatch rfpa-swatch"></span>RFPA volunteer coverage</div>`;
+    }
+    div.innerHTML = html;
     return div;
   };
   legend.addTo(map);

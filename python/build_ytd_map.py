@@ -48,6 +48,9 @@ from common import (
     PARCHMENT,
     PARCHMENT_DARK,
     PNG_PATH,
+    RFPA_EDGE,
+    RFPA_FILL,
+    RFPA_JSON,
     STATES_JSON,
     STATE_CODE_MAP,
     STATE_ORDER,
@@ -162,6 +165,20 @@ def load_boundaries() -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     return states, counties
 
 
+def load_rfpa() -> gpd.GeoDataFrame | None:
+    """Optional Rangeland Fire Protection Association boundaries.
+    File is manually curated (see python/fetch_rfpa.py). Returns None if
+    the file isn't present so the pipeline degrades gracefully."""
+    if not RFPA_JSON.exists():
+        _mylog("No RFPA boundaries found — skipping overlay")
+        return None
+    gdf = gpd.read_file(RFPA_JSON).to_crs(4326)
+    if "name" not in gdf.columns:
+        gdf["name"] = "Unnamed RFPA"
+    _mylog(f"RFPA polygons: {len(gdf)}")
+    return gdf
+
+
 # ---------------------------------------------------------------------------
 # Analysis
 # ---------------------------------------------------------------------------
@@ -224,12 +241,12 @@ def empty_stats() -> dict:
         "n_total": 0, "n_active": 0, "n_contained": 0,
         "total_acres": 0.0, "median_dist": 0.0, "n_over_50": 0,
         "pct_over_50": 0.0, "season_stage": "early",
-        "by_state": [], "top_stations": None,
+        "by_state": [], "top_stations": None, "rfpa": None,
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
     }
 
 
-def summarize(fires: gpd.GeoDataFrame) -> dict:
+def summarize(fires: gpd.GeoDataFrame, rfpa: gpd.GeoDataFrame | None = None) -> dict:
     n_total     = len(fires)
     n_active    = int(fires["is_active"].sum())
     total_acres = round(float(fires["acres"].sum()), 1)
@@ -286,7 +303,38 @@ def summarize(fires: gpd.GeoDataFrame) -> dict:
         "season_stage":  stage,
         "by_state":      by_state,
         "top_stations":  burden,
+        "rfpa":          rfpa_stats(fires, rfpa),
         "generated_at":  datetime.now().astimezone().isoformat(timespec="seconds"),
+    }
+
+
+def rfpa_stats(fires: gpd.GeoDataFrame, rfpa: gpd.GeoDataFrame | None) -> dict | None:
+    """How many of the >50km 'coverage gap' Oregon fires actually fall inside
+    an RFPA polygon? That's the whole story: gap on the map ≠ uncovered."""
+    if rfpa is None or len(rfpa) == 0:
+        return None
+    or_fires = fires[fires["state"] == "Oregon"]
+    if len(or_fires) == 0:
+        return {"n_rfpa": len(rfpa),
+                "or_gap_fires": 0, "or_gap_in_rfpa": 0, "or_gap_in_rfpa_pct": 0.0,
+                "total_acres_covered": float(rfpa.to_crs(WC_CRS).area.sum() * 0.000247105)}
+
+    # Union RFPA polygons for a single containment test
+    rfpa_union = rfpa.to_crs(4326).geometry.union_all()
+    gap_mask = or_fires["dist_nearest_km"] >= 50
+    gap = or_fires[gap_mask]
+    if len(gap) == 0:
+        in_rfpa = 0
+    else:
+        # Fire "in RFPA" if its representative point falls inside any polygon
+        pts = gap.geometry.representative_point()
+        in_rfpa = int(pts.within(rfpa_union).sum())
+    return {
+        "n_rfpa":              int(len(rfpa)),
+        "or_gap_fires":        int(len(gap)),
+        "or_gap_in_rfpa":      in_rfpa,
+        "or_gap_in_rfpa_pct":  round(in_rfpa / len(gap) * 100, 1) if len(gap) else 0.0,
+        "total_acres_covered": round(float(rfpa.to_crs(WC_CRS).area.sum() * 0.000247105), 0),
     }
 
 
@@ -329,28 +377,42 @@ def draw_subtitle(ax, stats: dict) -> None:
     if stats["total_acres"] > 0:
         parts.append(f" covering {round(stats['total_acres']):,} total acres")
     parts.append(f". Median distance to nearest station: {stats['median_dist']} km.")
+    r = stats.get("rfpa")
+    if r and r["or_gap_fires"] > 0:
+        parts.append(
+            f"  Of {r['or_gap_fires']} Oregon fires beyond 50 km, "
+            f"{r['or_gap_in_rfpa']} ({r['or_gap_in_rfpa_pct']}%) "
+            f"fall within Rangeland Fire Protection Association volunteer coverage."
+        )
     ax.text(0.02, 0.5, "".join(parts), fontsize=11, color=INK_BROWN, va="center")
 
 
-def draw_legend_strip(ax) -> None:
+def draw_legend_strip(ax, has_rfpa: bool = False) -> None:
     _bar(ax, PARCHMENT)
     ax.add_patch(mpatches.Rectangle((0.02, 0.25), 0.03, 0.5,
                                     facecolor=FIRE_ACTIVE, alpha=0.7,
                                     edgecolor="none"))
     ax.text(0.055, 0.5, "Active fire", fontsize=9, color=INK_BROWN, va="center")
 
-    ax.add_patch(mpatches.Rectangle((0.16, 0.25), 0.03, 0.5,
+    ax.add_patch(mpatches.Rectangle((0.15, 0.25), 0.03, 0.5,
                                     facecolor=FIRE_CONTAINED, alpha=0.5,
                                     edgecolor="none"))
-    ax.text(0.195, 0.5, "Contained", fontsize=9, color=INK_BROWN, va="center")
+    ax.text(0.185, 0.5, "Contained", fontsize=9, color=INK_BROWN, va="center")
 
-    ax.scatter([0.30], [0.5], marker="^", s=25, color=INK_BROWN)
-    ax.text(0.315, 0.5, "Fire station", fontsize=9, color=INK_BROWN, va="center")
+    ax.scatter([0.28], [0.5], marker="^", s=25, color=INK_BROWN)
+    ax.text(0.295, 0.5, "Fire station", fontsize=9, color=INK_BROWN, va="center")
 
-    ax.plot([0.42, 0.46], [0.5, 0.5], color=NATGEO_YELLOW_DK,
+    ax.plot([0.40, 0.44], [0.5, 0.5], color=NATGEO_YELLOW_DK,
             linewidth=1.2, linestyle="--")
-    ax.text(0.47, 0.5, "Distance to station (>25 km)",
+    ax.text(0.45, 0.5, "Distance to station (>25 km)",
             fontsize=9, color=INK_BROWN, va="center")
+
+    if has_rfpa:
+        ax.add_patch(mpatches.Rectangle((0.66, 0.25), 0.03, 0.5,
+                                        facecolor=RFPA_FILL, alpha=0.28,
+                                        edgecolor=RFPA_EDGE, linewidth=0.4))
+        ax.text(0.695, 0.5, "RFPA volunteer coverage",
+                fontsize=9, color=INK_BROWN, va="center")
 
 
 def draw_caption(ax) -> None:
@@ -403,9 +465,20 @@ def draw_stat_coverage(ax, stats: dict) -> None:
             ha="center", weight="bold", fontsize=10, color=FIRE_ACTIVE)
     ax.text(0.5, 0.32, f"{stats['pct_over_50']}% of all {year} fires",
             ha="center", fontsize=8, color=INK_GRAY)
-    ax.plot([0.1, 0.9], [0.22, 0.22], color=INK_BROWN, alpha=0.3, linewidth=0.6)
-    ax.text(0.5, 0.10, "Straight-line, perimeter edge to station",
-            ha="center", style="italic", fontsize=7, color=INK_GRAY)
+
+    r = stats.get("rfpa")
+    if r and r["or_gap_fires"] > 0:
+        ax.plot([0.1, 0.9], [0.24, 0.24], color=INK_BROWN, alpha=0.3, linewidth=0.6)
+        ax.text(0.5, 0.16,
+                f"{r['or_gap_in_rfpa']} of {r['or_gap_fires']} OR fires >50km",
+                ha="center", weight="bold", fontsize=8.5, color=INK_BROWN)
+        ax.text(0.5, 0.08,
+                f"inside RFPA coverage ({r['or_gap_in_rfpa_pct']}%)",
+                ha="center", fontsize=7.5, color=INK_GRAY)
+    else:
+        ax.plot([0.1, 0.9], [0.22, 0.22], color=INK_BROWN, alpha=0.3, linewidth=0.6)
+        ax.text(0.5, 0.10, "Straight-line, perimeter edge to station",
+                ha="center", style="italic", fontsize=7, color=INK_GRAY)
 
 
 def draw_stat_states(ax, stats: dict) -> None:
@@ -481,6 +554,7 @@ def draw_main_map(
     stations: gpd.GeoDataFrame,
     states: gpd.GeoDataFrame,
     counties: gpd.GeoDataFrame,
+    rfpa: gpd.GeoDataFrame | None,
 ) -> None:
     """All map layers plotted in EPSG:5070 (Albers) — equal-area, real proportions."""
     ax.set_facecolor(PARCHMENT)
@@ -501,7 +575,16 @@ def draw_main_map(
 
     wc_counties.plot(ax=ax, facecolor=PARCHMENT_DARK,
                      edgecolor=INK_BROWN, alpha=0.4, linewidth=0.2)
-    wc_states.plot(ax=ax, facecolor="none", edgecolor=INK_BLACK, linewidth=1.0)
+
+    # RFPA coverage — sits between the county fill and the fire polygons,
+    # so it reads as "protected differently" rather than clashing with fires
+    if rfpa is not None and len(rfpa) > 0:
+        rfpa.to_crs(WC_CRS).plot(
+            ax=ax, facecolor=RFPA_FILL, alpha=0.28,
+            edgecolor=RFPA_EDGE, linewidth=0.35, zorder=2,
+        )
+
+    wc_states.plot(ax=ax, facecolor="none", edgecolor=INK_BLACK, linewidth=1.0, zorder=3)
 
     minx, miny, maxx, maxy = wc_states.total_bounds
     sta_wc = stations_p.cx[minx:maxx, miny:maxy]
@@ -585,6 +668,7 @@ def build_figure(
     stations: gpd.GeoDataFrame,
     states: gpd.GeoDataFrame,
     counties: gpd.GeoDataFrame,
+    rfpa: gpd.GeoDataFrame | None,
     stats: dict,
 ) -> plt.Figure:
     fig = plt.figure(figsize=(18, 14), facecolor=PARCHMENT)
@@ -596,10 +680,10 @@ def build_figure(
     )
     draw_title(fig.add_subplot(outer[0]), datetime.now().year)
     draw_subtitle(fig.add_subplot(outer[1]), stats)
-    draw_legend_strip(fig.add_subplot(outer[2]))
+    draw_legend_strip(fig.add_subplot(outer[2]), has_rfpa=(rfpa is not None))
 
     map_row = outer[3].subgridspec(1, 2, width_ratios=[0.72, 0.28], wspace=0.02)
-    draw_main_map(fig.add_subplot(map_row[0]), fires, stations, states, counties)
+    draw_main_map(fig.add_subplot(map_row[0]), fires, stations, states, counties, rfpa)
 
     stage = stats["season_stage"]
     if stage == "early":
@@ -682,16 +766,23 @@ def main() -> int:
     _mylog(f"Stations: {len(stations)}")
     fires = compute_distances(fires, stations)
 
-    stats = summarize(fires)
+    rfpa = load_rfpa()
+    stats = summarize(fires, rfpa)
     _mylog(
         f"n={stats['n_total']} active={stats['n_active']} "
         f"acres={round(stats['total_acres']):,} median={stats['median_dist']}km "
         f"stage={stats['season_stage']}"
     )
+    if stats["rfpa"]:
+        r = stats["rfpa"]
+        _mylog(
+            f"RFPA: {r['or_gap_in_rfpa']}/{r['or_gap_fires']} "
+            f"({r['or_gap_in_rfpa_pct']}%) of Oregon >50km fires inside RFPA coverage"
+        )
     write_summary(stats)
 
     states, counties = load_boundaries()
-    fig = build_figure(fires, stations, states, counties, stats)
+    fig = build_figure(fires, stations, states, counties, rfpa, stats)
     fig.savefig(PNG_PATH, dpi=150, bbox_inches="tight", facecolor=PARCHMENT)
     plt.close(fig)
     _mylog(f"Wrote {PNG_PATH} ({PNG_PATH.stat().st_size / 1024:.0f} KB)")

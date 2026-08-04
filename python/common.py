@@ -31,6 +31,7 @@ PNG_PATH       = FIGURES_DIR / "ytd_natgeo.png"
 
 STATES_JSON    = DATA_DIR / "us_states.geojson"
 COUNTIES_JSON  = DATA_DIR / "us_counties.geojson"
+RFPA_JSON      = DATA_DIR / "rfpa_boundaries.geojson"
 
 # ---------------------------------------------------------------------------
 # Geographic scope
@@ -97,6 +98,11 @@ FIRE_ACTIVE      = "#8B1A1A"
 FIRE_ACTIVE_EDGE = "#5C1A0A"
 FIRE_CONTAINED   = "#5B7E5E"
 FIRE_CONTAINED_E = "#3D5C3F"
+
+# RFPA (Rangeland Fire Protection Association) coverage areas — a warm
+# rangeland tint. Sits under the fire perimeters but above the county fill.
+RFPA_FILL        = "#D9A94A"
+RFPA_EDGE        = "#8B6B26"
 
 # ---------------------------------------------------------------------------
 # Fire attribute schema — resilient to different producers

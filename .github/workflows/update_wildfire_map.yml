@@ -1,7 +1,4 @@
-name: Daily Wildfire Update
-
-# 5am Pacific / 13:00 UTC — one NIFC fetch, both outputs (fires.geojson + PNG).
-# Stations come from a separate monthly workflow; they don't change daily.
+﻿name: Daily Wildfire Update
 
 on:
   schedule:
@@ -44,6 +41,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Fetch RFPA boundaries (one-time, if missing)
+        if: hashFiles('data/rfpa_boundaries.geojson') == ''
+        run: python python/fetch_rfpa.py
+        continue-on-error: true
+
       - name: Fetch fresh perimeters
         run: python python/fetch_fires.py
 
@@ -60,6 +62,7 @@ jobs:
                   output/ytd_summary.txt \
                   data/us_states.geojson \
                   data/us_counties.geojson \
+                  data/rfpa_boundaries.geojson \
                   || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
