@@ -1,0 +1,10 @@
+# wildfire-response-gaps — Python dependencies
+
+geopandas>=1.0,<2.0
+matplotlib>=3.8,<4.0
+shapely>=2.0,<3.0
+pandas>=2.0,<3.0
+numpy>=1.26,<3.0
+requests>=2.31,<3.0
+adjustText>=1.0,<2.0
+pyogrio>=0.7,<1.0

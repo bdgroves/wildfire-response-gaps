@@ -1,12 +1,17 @@
-# R
-.Rhistory
-.RData
-.Rproj.user/
-*.Rproj
+﻿# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
 
-# Large output files - regenerate by running 00_run_all.R
-output/data/*.gpkg
-output/data/*.shp
+# OS
+.DS_Store
+Thumbs.db
 
-# No API keys in this project but good habit
-.env
+# Editor
+.vscode/
+.idea/
+
+# Local scratch
+scratch/
+*.tmp
