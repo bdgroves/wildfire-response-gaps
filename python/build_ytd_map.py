@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-"""build_ytd_map.py — build the NatGeo-style YTD map + summary JSON.
+﻿#!/usr/bin/env python3
+"""build_ytd_map.py â€” build the NatGeo-style YTD map + summary JSON.
 
 Reads:
   output/fires.geojson       (from fetch_fires.py, or --fetch to hit NIFC live)
@@ -114,7 +114,7 @@ def load_fires(allow_fetch: bool) -> gpd.GeoDataFrame:
             f"{FIRES_PATH} missing. Run python/fetch_fires.py first, "
             "or pass --fetch to hit NIFC directly."
         )
-    _mylog("Cache missing — fetching from NIFC directly")
+    _mylog("Cache missing â€” fetching from NIFC directly")
     from common import NIFC_STATE_CODES
     states = ",".join(f"'{c}'" for c in NIFC_STATE_CODES)
     where = f"attr_POOState IN ({states})"
@@ -170,7 +170,7 @@ def load_rfpa() -> gpd.GeoDataFrame | None:
     File is manually curated (see python/fetch_rfpa.py). Returns None if
     the file isn't present so the pipeline degrades gracefully."""
     if not RFPA_JSON.exists():
-        _mylog("No RFPA boundaries found — skipping overlay")
+        _mylog("No RFPA boundaries found â€” skipping overlay")
         return None
     gdf = gpd.read_file(RFPA_JSON).to_crs(4326)
     if "name" not in gdf.columns:
@@ -310,7 +310,7 @@ def summarize(fires: gpd.GeoDataFrame, rfpa: gpd.GeoDataFrame | None = None) -> 
 
 def rfpa_stats(fires: gpd.GeoDataFrame, rfpa: gpd.GeoDataFrame | None) -> dict | None:
     """How many of the >50km 'coverage gap' Oregon fires actually fall inside
-    an RFPA polygon? That's the whole story: gap on the map ≠ uncovered."""
+    an RFPA polygon? That's the whole story: gap on the map â‰  uncovered."""
     if rfpa is None or len(rfpa) == 0:
         return None
     or_fires = fires[fires["state"] == "Oregon"]
@@ -556,7 +556,7 @@ def draw_main_map(
     counties: gpd.GeoDataFrame,
     rfpa: gpd.GeoDataFrame | None,
 ) -> None:
-    """All map layers plotted in EPSG:5070 (Albers) — equal-area, real proportions."""
+    """All map layers plotted in EPSG:5070 (Albers) â€” equal-area, real proportions."""
     ax.set_facecolor(PARCHMENT)
     ax.set_xticks([]); ax.set_yticks([])
     for s in ax.spines.values():
@@ -576,7 +576,7 @@ def draw_main_map(
     wc_counties.plot(ax=ax, facecolor=PARCHMENT_DARK,
                      edgecolor=INK_BROWN, alpha=0.4, linewidth=0.2)
 
-    # RFPA coverage — sits between the county fill and the fire polygons,
+    # RFPA coverage â€” sits between the county fill and the fire polygons,
     # so it reads as "protected differently" rather than clashing with fires
     if rfpa is not None and len(rfpa) > 0:
         rfpa.to_crs(WC_CRS).plot(
@@ -630,7 +630,7 @@ def draw_main_map(
     texts = []
     for _, row in label_fires.iterrows():
         pt = row.geometry.representative_point()
-        active_tag = "  •  ACTIVE" if row["is_active"] else ""
+        active_tag = "  â€¢  ACTIVE" if row["is_active"] else ""
         text = f"{str(row['incident_name']).upper()}\n{format_acres(row['acres'])} ac{active_tag}"
         color = FIRE_ACTIVE if row["is_active"] else INK_BROWN
         t = ax.text(pt.x, pt.y, text, fontsize=6.5, weight="bold", color=color,
@@ -752,7 +752,7 @@ def main() -> int:
     _mylog(f"Raw fires: {len(fires_raw)}")
 
     if len(fires_raw) == 0:
-        _mylog("No fires — writing empty summary and exiting")
+        _mylog("No fires â€” writing empty summary and exiting")
         write_summary(empty_stats())
         return 0
 
