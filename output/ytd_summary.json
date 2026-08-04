@@ -80,6 +80,12 @@
       "states": "Washington"
     }
   ],
-  "rfpa": null,
-  "generated_at": "2026-08-04T23:35:48+00:00"
+  "rfpa": {
+    "n_rfpa": 15,
+    "or_gap_fires": 75,
+    "or_gap_in_rfpa": 74,
+    "or_gap_in_rfpa_pct": 98.7,
+    "total_acres_covered": 38730452.0
+  },
+  "generated_at": "2026-08-04T23:51:47+00:00"
 }
