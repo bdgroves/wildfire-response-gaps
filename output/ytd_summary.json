@@ -1,1 +1,84 @@
-﻿{"n_total":0,"n_active":0,"n_contained":0,"total_acres":0,"median_dist":0,"n_over_50":0,"pct_over_50":0.0,"season_stage":"early","by_state":[],"top_stations":null,"generated_at":null}
+{
+  "n_total": 839,
+  "n_active": 733,
+  "n_contained": 106,
+  "total_acres": 2672506.8,
+  "median_dist": 10.4,
+  "n_over_50": 78,
+  "pct_over_50": 9.3,
+  "season_stage": "peak",
+  "by_state": [
+    {
+      "state": "Washington",
+      "n_fires": 360,
+      "n_active": 332,
+      "total_acres": 597296.4,
+      "median_dist": 7.9,
+      "pct_over_50": 0.6
+    },
+    {
+      "state": "Oregon",
+      "n_fires": 245,
+      "n_active": 203,
+      "total_acres": 1907906.2,
+      "median_dist": 25.6,
+      "pct_over_50": 30.6
+    },
+    {
+      "state": "California",
+      "n_fires": 234,
+      "n_active": 198,
+      "total_acres": 167304.1,
+      "median_dist": 8.0,
+      "pct_over_50": 0.4
+    }
+  ],
+  "top_stations": [
+    {
+      "nearest_station_name": "City of Antelope Fire Department Fire Station",
+      "n_fires": 34,
+      "n_active": 22,
+      "total_acres": 221754.6,
+      "mean_dist": 56.6,
+      "max_dist": 140.2,
+      "states": "Oregon"
+    },
+    {
+      "nearest_station_name": "Frenchglen Fire Guard Station",
+      "n_fires": 23,
+      "n_active": 18,
+      "total_acres": 280852.8,
+      "mean_dist": 63.0,
+      "max_dist": 107.6,
+      "states": "Oregon"
+    },
+    {
+      "nearest_station_name": "Deer Valley Fire Station",
+      "n_fires": 18,
+      "n_active": 18,
+      "total_acres": 10.8,
+      "mean_dist": 8.8,
+      "max_dist": 23.8,
+      "states": "Washington"
+    },
+    {
+      "nearest_station_name": "Stevens County Fire & Rescue Station 2",
+      "n_fires": 17,
+      "n_active": 17,
+      "total_acres": 5387.6,
+      "mean_dist": 15.2,
+      "max_dist": 35.6,
+      "states": "Washington"
+    },
+    {
+      "nearest_station_name": "Arden Fire Station",
+      "n_fires": 17,
+      "n_active": 17,
+      "total_acres": 4466.9,
+      "mean_dist": 22.0,
+      "max_dist": 40.7,
+      "states": "Washington"
+    }
+  ],
+  "generated_at": "2026-08-04T22:45:33+00:00"
+}
