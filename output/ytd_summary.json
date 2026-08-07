@@ -1,34 +1,34 @@
 {
-  "n_total": 852,
-  "n_active": 744,
-  "n_contained": 108,
-  "total_acres": 2516765.9,
+  "n_total": 864,
+  "n_active": 755,
+  "n_contained": 109,
+  "total_acres": 2753031.7,
   "median_dist": 10.4,
   "n_over_50": 79,
-  "pct_over_50": 9.3,
+  "pct_over_50": 9.1,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 370,
-      "n_active": 340,
-      "total_acres": 639040.3,
-      "median_dist": 7.8,
+      "n_fires": 376,
+      "n_active": 346,
+      "total_acres": 650681.4,
+      "median_dist": 7.7,
       "pct_over_50": 0.5
     },
     {
       "state": "Oregon",
-      "n_fires": 247,
-      "n_active": 205,
-      "total_acres": 1700322.9,
-      "median_dist": 26.5,
-      "pct_over_50": 30.8
+      "n_fires": 251,
+      "n_active": 209,
+      "total_acres": 1924257.6,
+      "median_dist": 25.1,
+      "pct_over_50": 30.3
     },
     {
       "state": "California",
-      "n_fires": 235,
-      "n_active": 199,
-      "total_acres": 177402.6,
+      "n_fires": 237,
+      "n_active": 200,
+      "total_acres": 178092.6,
       "median_dist": 8.0,
       "pct_over_50": 0.4
     }
@@ -53,6 +53,15 @@
       "states": "Oregon"
     },
     {
+      "nearest_station_name": "Arden Fire Station",
+      "n_fires": 18,
+      "n_active": 18,
+      "total_acres": 4566.4,
+      "mean_dist": 21.1,
+      "max_dist": 40.7,
+      "states": "Washington"
+    },
+    {
       "nearest_station_name": "Deer Valley Fire Station",
       "n_fires": 18,
       "n_active": 18,
@@ -62,22 +71,13 @@
       "states": "Washington"
     },
     {
-      "nearest_station_name": "Arden Fire Station",
-      "n_fires": 18,
-      "n_active": 18,
-      "total_acres": 4560.4,
-      "mean_dist": 21.1,
-      "max_dist": 40.7,
-      "states": "Washington"
-    },
-    {
-      "nearest_station_name": "La Grande Fire House",
+      "nearest_station_name": "Stevens County Fire & Rescue Station 2",
       "n_fires": 17,
       "n_active": 17,
-      "total_acres": 8663.9,
-      "mean_dist": 67.5,
-      "max_dist": 129.5,
-      "states": "Oregon"
+      "total_acres": 5902.6,
+      "mean_dist": 15.2,
+      "max_dist": 35.6,
+      "states": "Washington"
     }
   ],
   "rfpa": {
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.7,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-06T15:13:01+00:00"
+  "generated_at": "2026-08-07T14:10:39+00:00"
 }
