@@ -1,35 +1,35 @@
 {
-  "n_total": 886,
-  "n_active": 773,
-  "n_contained": 113,
-  "total_acres": 3115182.0,
-  "median_dist": 10.4,
+  "n_total": 892,
+  "n_active": 780,
+  "n_contained": 112,
+  "total_acres": 3145781.0,
+  "median_dist": 10.3,
   "n_over_50": 80,
   "pct_over_50": 9.0,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 386,
-      "n_active": 355,
-      "total_acres": 727648.3,
+      "n_fires": 388,
+      "n_active": 357,
+      "total_acres": 747906.3,
       "median_dist": 7.8,
       "pct_over_50": 0.5
     },
     {
       "state": "Oregon",
-      "n_fires": 256,
-      "n_active": 212,
-      "total_acres": 2193642.4,
-      "median_dist": 25.3,
-      "pct_over_50": 30.1
+      "n_fires": 257,
+      "n_active": 214,
+      "total_acres": 2186755.4,
+      "median_dist": 25.6,
+      "pct_over_50": 30.0
     },
     {
       "state": "California",
-      "n_fires": 244,
-      "n_active": 206,
-      "total_acres": 193891.3,
-      "median_dist": 8.2,
+      "n_fires": 247,
+      "n_active": 209,
+      "total_acres": 211119.3,
+      "median_dist": 7.9,
       "pct_over_50": 0.4
     }
   ],
@@ -37,8 +37,8 @@
     {
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
       "n_fires": 37,
-      "n_active": 24,
-      "total_acres": 226474.5,
+      "n_active": 25,
+      "total_acres": 228359.5,
       "mean_dist": 58.3,
       "max_dist": 140.2,
       "states": "Oregon"
@@ -53,20 +53,11 @@
       "states": "Oregon"
     },
     {
-      "nearest_station_name": "Arden Fire Station",
-      "n_fires": 18,
-      "n_active": 18,
-      "total_acres": 4566.4,
-      "mean_dist": 21.1,
-      "max_dist": 40.7,
-      "states": "Washington"
-    },
-    {
       "nearest_station_name": "La Grande Fire House",
       "n_fires": 18,
       "n_active": 18,
-      "total_acres": 51369.9,
-      "mean_dist": 65.5,
+      "total_acres": 55197.9,
+      "mean_dist": 65.4,
       "max_dist": 129.5,
       "states": "Oregon"
     },
@@ -78,6 +69,15 @@
       "mean_dist": 8.8,
       "max_dist": 23.8,
       "states": "Washington"
+    },
+    {
+      "nearest_station_name": "Arden Fire Station",
+      "n_fires": 18,
+      "n_active": 18,
+      "total_acres": 4566.4,
+      "mean_dist": 21.1,
+      "max_dist": 40.7,
+      "states": "Washington"
     }
   ],
   "rfpa": {
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.7,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-09T13:45:56+00:00"
+  "generated_at": "2026-08-10T14:19:01+00:00"
 }
