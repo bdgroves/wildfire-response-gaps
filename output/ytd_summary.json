@@ -1,34 +1,34 @@
 {
-  "n_total": 904,
-  "n_active": 784,
-  "n_contained": 120,
-  "total_acres": 3345009.0,
+  "n_total": 912,
+  "n_active": 793,
+  "n_contained": 119,
+  "total_acres": 3370032.6,
   "median_dist": 10.4,
-  "n_over_50": 82,
+  "n_over_50": 83,
   "pct_over_50": 9.1,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 391,
-      "n_active": 356,
-      "total_acres": 784402.8,
+      "n_fires": 396,
+      "n_active": 362,
+      "total_acres": 783022.4,
       "median_dist": 7.8,
       "pct_over_50": 0.5
     },
     {
       "state": "Oregon",
-      "n_fires": 263,
-      "n_active": 217,
-      "total_acres": 2285976.6,
-      "median_dist": 25.1,
-      "pct_over_50": 30.0
+      "n_fires": 264,
+      "n_active": 218,
+      "total_acres": 2293224.6,
+      "median_dist": 25.3,
+      "pct_over_50": 30.3
     },
     {
       "state": "California",
-      "n_fires": 250,
-      "n_active": 211,
-      "total_acres": 274629.5,
+      "n_fires": 252,
+      "n_active": 213,
+      "total_acres": 293785.5,
       "median_dist": 8.0,
       "pct_over_50": 0.4
     }
@@ -36,10 +36,10 @@
   "top_stations": [
     {
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
-      "n_fires": 37,
-      "n_active": 25,
-      "total_acres": 228716.5,
-      "mean_dist": 58.3,
+      "n_fires": 38,
+      "n_active": 26,
+      "total_acres": 228979.5,
+      "mean_dist": 58.2,
       "max_dist": 140.2,
       "states": "Oregon"
     },
@@ -53,6 +53,24 @@
       "states": "Oregon"
     },
     {
+      "nearest_station_name": "Arden Fire Station",
+      "n_fires": 20,
+      "n_active": 20,
+      "total_acres": 4559.6,
+      "mean_dist": 21.0,
+      "max_dist": 40.7,
+      "states": "Washington"
+    },
+    {
+      "nearest_station_name": "Stevens County Fire & Rescue Station 2",
+      "n_fires": 19,
+      "n_active": 19,
+      "total_acres": 6770.0,
+      "mean_dist": 14.9,
+      "max_dist": 35.6,
+      "states": "Washington"
+    },
+    {
       "nearest_station_name": "Deer Valley Fire Station",
       "n_fires": 19,
       "n_active": 19,
@@ -60,32 +78,14 @@
       "mean_dist": 8.7,
       "max_dist": 23.8,
       "states": "Washington"
-    },
-    {
-      "nearest_station_name": "La Grande Fire House",
-      "n_fires": 19,
-      "n_active": 19,
-      "total_acres": 62039.9,
-      "mean_dist": 68.1,
-      "max_dist": 129.5,
-      "states": "Oregon"
-    },
-    {
-      "nearest_station_name": "Arden Fire Station",
-      "n_fires": 18,
-      "n_active": 18,
-      "total_acres": 4561.4,
-      "mean_dist": 21.1,
-      "max_dist": 40.7,
-      "states": "Washington"
     }
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 79,
-    "or_gap_in_rfpa": 77,
+    "or_gap_fires": 80,
+    "or_gap_in_rfpa": 78,
     "or_gap_in_rfpa_pct": 97.5,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-13T14:21:37+00:00"
+  "generated_at": "2026-08-14T14:14:19+00:00"
 }
