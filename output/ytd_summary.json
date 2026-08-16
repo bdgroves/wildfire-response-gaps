@@ -1,34 +1,34 @@
 {
-  "n_total": 916,
-  "n_active": 794,
-  "n_contained": 122,
-  "total_acres": 3341010.8,
-  "median_dist": 10.4,
+  "n_total": 919,
+  "n_active": 795,
+  "n_contained": 124,
+  "total_acres": 3344428.8,
+  "median_dist": 10.5,
   "n_over_50": 82,
-  "pct_over_50": 9.0,
+  "pct_over_50": 8.9,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 398,
+      "n_fires": 399,
       "n_active": 363,
-      "total_acres": 784429.6,
+      "total_acres": 787925.5,
       "median_dist": 7.9,
       "pct_over_50": 0.5
     },
     {
       "state": "Oregon",
-      "n_fires": 266,
-      "n_active": 219,
-      "total_acres": 2257697.6,
+      "n_fires": 268,
+      "n_active": 221,
+      "total_acres": 2255503.7,
       "median_dist": 25.0,
-      "pct_over_50": 29.7
+      "pct_over_50": 29.5
     },
     {
       "state": "California",
       "n_fires": 252,
-      "n_active": 212,
-      "total_acres": 298883.5,
+      "n_active": 211,
+      "total_acres": 300999.5,
       "median_dist": 8.0,
       "pct_over_50": 0.4
     }
@@ -53,30 +53,30 @@
       "states": "Oregon"
     },
     {
+      "nearest_station_name": "La Grande Fire House",
+      "n_fires": 21,
+      "n_active": 21,
+      "total_acres": 64481.0,
+      "mean_dist": 64.0,
+      "max_dist": 129.5,
+      "states": "Oregon"
+    },
+    {
+      "nearest_station_name": "Arden Fire Station",
+      "n_fires": 20,
+      "n_active": 20,
+      "total_acres": 4559.5,
+      "mean_dist": 21.0,
+      "max_dist": 40.7,
+      "states": "Washington"
+    },
+    {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
       "n_fires": 20,
       "n_active": 20,
       "total_acres": 6770.1,
       "mean_dist": 15.5,
       "max_dist": 35.6,
-      "states": "Washington"
-    },
-    {
-      "nearest_station_name": "Arden Fire Station",
-      "n_fires": 20,
-      "n_active": 20,
-      "total_acres": 4559.6,
-      "mean_dist": 21.0,
-      "max_dist": 40.7,
-      "states": "Washington"
-    },
-    {
-      "nearest_station_name": "Deer Valley Fire Station",
-      "n_fires": 19,
-      "n_active": 19,
-      "total_acres": 11.0,
-      "mean_dist": 8.7,
-      "max_dist": 23.8,
       "states": "Washington"
     }
   ],
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 97.5,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-15T13:27:12+00:00"
+  "generated_at": "2026-08-16T13:28:03+00:00"
 }
