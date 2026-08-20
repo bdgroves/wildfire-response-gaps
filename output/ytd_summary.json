@@ -1,34 +1,34 @@
 {
-  "n_total": 947,
-  "n_active": 819,
-  "n_contained": 128,
-  "total_acres": 3421573.3,
+  "n_total": 953,
+  "n_active": 821,
+  "n_contained": 132,
+  "total_acres": 3426317.0,
   "median_dist": 10.5,
   "n_over_50": 86,
-  "pct_over_50": 9.1,
+  "pct_over_50": 9.0,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 410,
+      "n_fires": 413,
       "n_active": 374,
-      "total_acres": 787363.7,
+      "total_acres": 788956.1,
       "median_dist": 8.0,
       "pct_over_50": 0.7
     },
     {
       "state": "Oregon",
-      "n_fires": 274,
-      "n_active": 225,
-      "total_acres": 2330574.2,
-      "median_dist": 25.3,
-      "pct_over_50": 29.9
+      "n_fires": 275,
+      "n_active": 226,
+      "total_acres": 2333220.2,
+      "median_dist": 25.1,
+      "pct_over_50": 29.8
     },
     {
       "state": "California",
-      "n_fires": 263,
-      "n_active": 220,
-      "total_acres": 303635.4,
+      "n_fires": 265,
+      "n_active": 221,
+      "total_acres": 304140.7,
       "median_dist": 7.7,
       "pct_over_50": 0.4
     }
@@ -53,27 +53,27 @@
       "states": "Oregon"
     },
     {
-      "nearest_station_name": "La Grande Fire House",
+      "nearest_station_name": "Arden Fire Station",
       "n_fires": 21,
       "n_active": 21,
-      "total_acres": 66421.0,
-      "mean_dist": 64.0,
-      "max_dist": 129.5,
-      "states": "Oregon"
-    },
-    {
-      "nearest_station_name": "Arden Fire Station",
-      "n_fires": 20,
-      "n_active": 20,
-      "total_acres": 4559.5,
+      "total_acres": 4561.1,
       "mean_dist": 21.0,
       "max_dist": 40.7,
       "states": "Washington"
     },
     {
+      "nearest_station_name": "La Grande Fire House",
+      "n_fires": 21,
+      "n_active": 21,
+      "total_acres": 66896.0,
+      "mean_dist": 64.0,
+      "max_dist": 129.5,
+      "states": "Oregon"
+    },
+    {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
       "n_fires": 20,
-      "n_active": 20,
+      "n_active": 19,
       "total_acres": 6770.1,
       "mean_dist": 15.5,
       "max_dist": 35.6,
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 97.6,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-19T13:40:53+00:00"
+  "generated_at": "2026-08-20T13:42:38+00:00"
 }
