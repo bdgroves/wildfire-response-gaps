@@ -1,8 +1,8 @@
 {
-  "n_total": 963,
-  "n_active": 829,
-  "n_contained": 134,
-  "total_acres": 3430659.7,
+  "n_total": 968,
+  "n_active": 830,
+  "n_contained": 138,
+  "total_acres": 3366233.6,
   "median_dist": 10.6,
   "n_over_50": 87,
   "pct_over_50": 9.0,
@@ -10,25 +10,25 @@
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 420,
-      "n_active": 379,
-      "total_acres": 791223.7,
+      "n_fires": 424,
+      "n_active": 383,
+      "total_acres": 794377.3,
       "median_dist": 8.1,
-      "pct_over_50": 1.0
+      "pct_over_50": 0.9
     },
     {
       "state": "Oregon",
-      "n_fires": 275,
-      "n_active": 226,
-      "total_acres": 2334538.2,
+      "n_fires": 276,
+      "n_active": 223,
+      "total_acres": 2266316.6,
       "median_dist": 25.1,
-      "pct_over_50": 29.8
+      "pct_over_50": 29.7
     },
     {
       "state": "California",
       "n_fires": 268,
       "n_active": 224,
-      "total_acres": 304897.7,
+      "total_acres": 305539.7,
       "median_dist": 7.7,
       "pct_over_50": 0.4
     }
@@ -37,8 +37,8 @@
     {
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
       "n_fires": 39,
-      "n_active": 26,
-      "total_acres": 189314.7,
+      "n_active": 25,
+      "total_acres": 118558.7,
       "mean_dist": 59.0,
       "max_dist": 140.2,
       "states": "Oregon"
@@ -53,6 +53,15 @@
       "states": "Oregon"
     },
     {
+      "nearest_station_name": "La Grande Fire House",
+      "n_fires": 21,
+      "n_active": 20,
+      "total_acres": 67850.0,
+      "mean_dist": 64.0,
+      "max_dist": 129.5,
+      "states": "Oregon"
+    },
+    {
       "nearest_station_name": "Arden Fire Station",
       "n_fires": 21,
       "n_active": 20,
@@ -60,15 +69,6 @@
       "mean_dist": 21.0,
       "max_dist": 40.7,
       "states": "Washington"
-    },
-    {
-      "nearest_station_name": "La Grande Fire House",
-      "n_fires": 21,
-      "n_active": 21,
-      "total_acres": 67389.0,
-      "mean_dist": 64.0,
-      "max_dist": 129.5,
-      "states": "Oregon"
     },
     {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 97.6,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-21T13:41:26+00:00"
+  "generated_at": "2026-08-22T13:27:54+00:00"
 }
