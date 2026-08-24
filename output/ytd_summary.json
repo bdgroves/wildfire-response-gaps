@@ -1,34 +1,34 @@
 {
-  "n_total": 989,
-  "n_active": 849,
+  "n_total": 1005,
+  "n_active": 865,
   "n_contained": 140,
-  "total_acres": 3424951.6,
-  "median_dist": 10.8,
-  "n_over_50": 91,
-  "pct_over_50": 9.2,
+  "total_acres": 3470015.3,
+  "median_dist": 10.9,
+  "n_over_50": 97,
+  "pct_over_50": 9.7,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 434,
-      "n_active": 392,
-      "total_acres": 803198.8,
+      "n_fires": 441,
+      "n_active": 399,
+      "total_acres": 842158.5,
       "median_dist": 8.2,
       "pct_over_50": 0.9
     },
     {
       "state": "Oregon",
-      "n_fires": 287,
-      "n_active": 234,
-      "total_acres": 2314217.0,
-      "median_dist": 25.0,
-      "pct_over_50": 30.0
+      "n_fires": 296,
+      "n_active": 243,
+      "total_acres": 2316851.1,
+      "median_dist": 26.6,
+      "pct_over_50": 31.1
     },
     {
       "state": "California",
       "n_fires": 268,
       "n_active": 223,
-      "total_acres": 307535.7,
+      "total_acres": 311005.7,
       "median_dist": 7.7,
       "pct_over_50": 0.4
     }
@@ -44,21 +44,21 @@
       "states": "Oregon"
     },
     {
-      "nearest_station_name": "Frenchglen Fire Guard Station",
-      "n_fires": 24,
-      "n_active": 17,
-      "total_acres": 277480.0,
-      "mean_dist": 62.2,
-      "max_dist": 107.6,
+      "nearest_station_name": "La Grande Fire House",
+      "n_fires": 27,
+      "n_active": 26,
+      "total_acres": 69915.5,
+      "mean_dist": 57.9,
+      "max_dist": 129.5,
       "states": "Oregon"
     },
     {
-      "nearest_station_name": "La Grande Fire House",
-      "n_fires": 22,
-      "n_active": 21,
-      "total_acres": 68308.1,
-      "mean_dist": 61.7,
-      "max_dist": 129.5,
+      "nearest_station_name": "Frenchglen Fire Guard Station",
+      "n_fires": 25,
+      "n_active": 18,
+      "total_acres": 277524.0,
+      "mean_dist": 62.3,
+      "max_dist": 107.6,
       "states": "Oregon"
     },
     {
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 86,
-    "or_gap_in_rfpa": 84,
-    "or_gap_in_rfpa_pct": 97.7,
+    "or_gap_fires": 92,
+    "or_gap_in_rfpa": 90,
+    "or_gap_in_rfpa_pct": 97.8,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-23T13:28:40+00:00"
+  "generated_at": "2026-08-24T13:46:58+00:00"
 }
