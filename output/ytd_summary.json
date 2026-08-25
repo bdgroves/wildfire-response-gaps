@@ -1,35 +1,35 @@
 {
-  "n_total": 1005,
-  "n_active": 865,
-  "n_contained": 140,
-  "total_acres": 3470015.3,
+  "n_total": 1023,
+  "n_active": 881,
+  "n_contained": 142,
+  "total_acres": 3477643.8,
   "median_dist": 10.9,
-  "n_over_50": 97,
-  "pct_over_50": 9.7,
+  "n_over_50": 98,
+  "pct_over_50": 9.6,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 441,
-      "n_active": 399,
-      "total_acres": 842158.5,
+      "n_fires": 449,
+      "n_active": 406,
+      "total_acres": 844350.9,
       "median_dist": 8.2,
       "pct_over_50": 0.9
     },
     {
       "state": "Oregon",
-      "n_fires": 296,
-      "n_active": 243,
-      "total_acres": 2316851.1,
+      "n_fires": 300,
+      "n_active": 247,
+      "total_acres": 2321140.0,
       "median_dist": 26.6,
-      "pct_over_50": 31.1
+      "pct_over_50": 31.0
     },
     {
       "state": "California",
-      "n_fires": 268,
-      "n_active": 223,
-      "total_acres": 311005.7,
-      "median_dist": 7.7,
+      "n_fires": 274,
+      "n_active": 228,
+      "total_acres": 312152.8,
+      "median_dist": 7.9,
       "pct_over_50": 0.4
     }
   ],
@@ -45,10 +45,10 @@
     },
     {
       "nearest_station_name": "La Grande Fire House",
-      "n_fires": 27,
-      "n_active": 26,
-      "total_acres": 69915.5,
-      "mean_dist": 57.9,
+      "n_fires": 28,
+      "n_active": 27,
+      "total_acres": 73472.3,
+      "mean_dist": 57.7,
       "max_dist": 129.5,
       "states": "Oregon"
     },
@@ -62,6 +62,15 @@
       "states": "Oregon"
     },
     {
+      "nearest_station_name": "Stevens County Fire & Rescue Station 2",
+      "n_fires": 22,
+      "n_active": 21,
+      "total_acres": 6770.5,
+      "mean_dist": 15.8,
+      "max_dist": 35.6,
+      "states": "Washington"
+    },
+    {
       "nearest_station_name": "Arden Fire Station",
       "n_fires": 21,
       "n_active": 20,
@@ -69,23 +78,14 @@
       "mean_dist": 21.0,
       "max_dist": 40.7,
       "states": "Washington"
-    },
-    {
-      "nearest_station_name": "Stevens County Fire & Rescue Station 2",
-      "n_fires": 21,
-      "n_active": 20,
-      "total_acres": 6770.2,
-      "mean_dist": 16.3,
-      "max_dist": 35.6,
-      "states": "Washington"
     }
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 92,
-    "or_gap_in_rfpa": 90,
+    "or_gap_fires": 93,
+    "or_gap_in_rfpa": 91,
     "or_gap_in_rfpa_pct": 97.8,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-24T13:46:58+00:00"
+  "generated_at": "2026-08-25T13:45:19+00:00"
 }
