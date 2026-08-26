@@ -1,34 +1,34 @@
 {
-  "n_total": 1023,
-  "n_active": 881,
-  "n_contained": 142,
-  "total_acres": 3477643.8,
+  "n_total": 1036,
+  "n_active": 893,
+  "n_contained": 143,
+  "total_acres": 3453413.4,
   "median_dist": 10.9,
-  "n_over_50": 98,
-  "pct_over_50": 9.6,
+  "n_over_50": 100,
+  "pct_over_50": 9.7,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 449,
-      "n_active": 406,
-      "total_acres": 844350.9,
-      "median_dist": 8.2,
-      "pct_over_50": 0.9
+      "n_fires": 457,
+      "n_active": 414,
+      "total_acres": 847023.9,
+      "median_dist": 8.3,
+      "pct_over_50": 1.1
     },
     {
       "state": "Oregon",
-      "n_fires": 300,
-      "n_active": 247,
-      "total_acres": 2321140.0,
-      "median_dist": 26.6,
-      "pct_over_50": 31.0
+      "n_fires": 302,
+      "n_active": 248,
+      "total_acres": 2290643.4,
+      "median_dist": 26.1,
+      "pct_over_50": 31.1
     },
     {
       "state": "California",
-      "n_fires": 274,
-      "n_active": 228,
-      "total_acres": 312152.8,
+      "n_fires": 277,
+      "n_active": 231,
+      "total_acres": 315746.2,
       "median_dist": 7.9,
       "pct_over_50": 0.4
     }
@@ -38,7 +38,7 @@
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
       "n_fires": 40,
       "n_active": 26,
-      "total_acres": 189289.7,
+      "total_acres": 229106.1,
       "mean_dist": 57.8,
       "max_dist": 140.2,
       "states": "Oregon"
@@ -47,17 +47,17 @@
       "nearest_station_name": "La Grande Fire House",
       "n_fires": 28,
       "n_active": 27,
-      "total_acres": 73472.3,
-      "mean_dist": 57.7,
+      "total_acres": 73667.3,
+      "mean_dist": 57.6,
       "max_dist": 129.5,
       "states": "Oregon"
     },
     {
       "nearest_station_name": "Frenchglen Fire Guard Station",
-      "n_fires": 25,
-      "n_active": 18,
-      "total_acres": 277524.0,
-      "mean_dist": 62.3,
+      "n_fires": 26,
+      "n_active": 19,
+      "total_acres": 277781.3,
+      "mean_dist": 60.9,
       "max_dist": 107.6,
       "states": "Oregon"
     },
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 93,
-    "or_gap_in_rfpa": 91,
-    "or_gap_in_rfpa_pct": 97.8,
+    "or_gap_fires": 94,
+    "or_gap_in_rfpa": 92,
+    "or_gap_in_rfpa_pct": 97.9,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-25T13:45:19+00:00"
+  "generated_at": "2026-08-26T13:52:43+00:00"
 }
