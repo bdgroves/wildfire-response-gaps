@@ -1,34 +1,34 @@
 {
-  "n_total": 1036,
-  "n_active": 893,
+  "n_total": 1054,
+  "n_active": 911,
   "n_contained": 143,
-  "total_acres": 3453413.4,
+  "total_acres": 3469028.4,
   "median_dist": 10.9,
-  "n_over_50": 100,
-  "pct_over_50": 9.7,
+  "n_over_50": 104,
+  "pct_over_50": 9.9,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 457,
-      "n_active": 414,
-      "total_acres": 847023.9,
-      "median_dist": 8.3,
+      "n_fires": 467,
+      "n_active": 424,
+      "total_acres": 849483.7,
+      "median_dist": 8.2,
       "pct_over_50": 1.1
     },
     {
       "state": "Oregon",
-      "n_fires": 302,
-      "n_active": 248,
-      "total_acres": 2290643.4,
-      "median_dist": 26.1,
-      "pct_over_50": 31.1
+      "n_fires": 308,
+      "n_active": 254,
+      "total_acres": 2303698.5,
+      "median_dist": 26.6,
+      "pct_over_50": 31.8
     },
     {
       "state": "California",
-      "n_fires": 277,
-      "n_active": 231,
-      "total_acres": 315746.2,
+      "n_fires": 279,
+      "n_active": 233,
+      "total_acres": 315846.2,
       "median_dist": 7.9,
       "pct_over_50": 0.4
     }
@@ -47,17 +47,17 @@
       "nearest_station_name": "La Grande Fire House",
       "n_fires": 28,
       "n_active": 27,
-      "total_acres": 73667.3,
+      "total_acres": 73893.3,
       "mean_dist": 57.6,
       "max_dist": 129.5,
       "states": "Oregon"
     },
     {
       "nearest_station_name": "Frenchglen Fire Guard Station",
-      "n_fires": 26,
-      "n_active": 19,
-      "total_acres": 277781.3,
-      "mean_dist": 60.9,
+      "n_fires": 27,
+      "n_active": 20,
+      "total_acres": 277784.0,
+      "mean_dist": 61.5,
       "max_dist": 107.6,
       "states": "Oregon"
     },
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 94,
-    "or_gap_in_rfpa": 92,
-    "or_gap_in_rfpa_pct": 97.9,
+    "or_gap_fires": 98,
+    "or_gap_in_rfpa": 96,
+    "or_gap_in_rfpa_pct": 98.0,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-26T13:52:43+00:00"
+  "generated_at": "2026-08-27T22:45:06+00:00"
 }
