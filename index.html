@@ -132,6 +132,10 @@
     min-height: 480px;
     background: var(--parchment);
   }
+  .leaflet-tile-pane {
+    filter: grayscale(35%) brightness(1.08) contrast(0.9) sepia(12%);
+  }
+
 
   /* Leaflet overrides to match the parchment aesthetic */
   .leaflet-container {
@@ -334,10 +338,14 @@
     preferCanvas: true,   // faster with lots of polygons
   }).setView([42.5, -120.0], 6);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap contributors · © CARTO',
-    subdomains: 'abcd',
-    maxZoom: 18,
+  // OSM's own tile server — no API key, no third-party CDN dependency.
+  // A CSS filter (see .leaflet-tile-pane below) mutes it toward the
+  // parchment/NatGeo palette, since raw OSM tiles run more saturated
+  // than CARTO Light did.
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    subdomains: 'abc',
+    maxZoom: 19,
   }).addTo(map);
 
   // ---- RFPA coverage (rangeland fire protection associations) ----
@@ -363,7 +371,10 @@
       );
     },
   });
-  if (rfpa && rfpa.features && rfpa.features.length) rfpaLayer.addTo(map);
+  // Off by default — RFPA polygons are large and visually dominant;
+  // shown only if the user opts in via the layer control, same
+  // opt-in principle as the date-range filter below.
+  // (rfpaLayer intentionally NOT added to the map here.)
 
   // ---- Stations (triangles) ----
   const stationsById = new Map();
@@ -415,9 +426,6 @@
     `, { maxWidth: 260 });
   };
 
-  // Fire layer group holding whatever the current date filter selects.
-  // Rebuilt on every slider move rather than toggling visibility, so the
-  // stat strip and subtitle can recompute against exactly what's on screen.
   const fireLayerGroup = L.layerGroup().addTo(map);
   let firstFit = true;
 
@@ -432,7 +440,7 @@
 
     const inRange = fires.features.filter(f => {
       const t = fireDate(f);
-      return t === null || t >= minTime; // undated fires always shown
+      return t === null || t >= minTime;
     });
     const contained = { type: 'FeatureCollection', features: inRange.filter(f => {
       const p = f.properties;
@@ -449,8 +457,6 @@
     const activeLayer = L.geoJSON(active, { style: styleFire, onEachFeature: onEachFire })
       .addTo(fireLayerGroup);
 
-    // Only auto-fit bounds on the very first render — once a user is
-    // dragging the slider, snapping the viewport around is disorienting.
     if (firstFit) {
       firstFit = false;
       try {
@@ -460,8 +466,6 @@
       } catch (e) { /* ok */ }
     }
 
-    // Live stat strip: reflects exactly what's currently drawn, not the
-    // season total, whenever the filter is narrower than "all season".
     const nActive = active.features.length;
     const nContained = contained.features.length;
     const nShown = nActive + nContained;
@@ -476,15 +480,14 @@
     $('s-active').textContent = nActive.toLocaleString();
     $('s-contained').textContent = nContained.toLocaleString();
     $('s-acres').textContent = Math.round(acres).toLocaleString();
-    // Median distance and the >50km count come from the precomputed season
-    // summary (fires.geojson carries no per-feature distance yet), so those
-    // two figures stay at their season-long values regardless of the filter.
+    // Median distance / >50km count stay at season-long values — no
+    // per-fire distance is stored on the raw features, only in the
+    // precomputed summary.
   }
 
   if (fires.features && fires.features.length) {
-    renderFires(-Infinity); // unfiltered initial render
+    renderFires(-Infinity);
 
-    // ---- Wire up the date-range slider ----
     const allTimes = fires.features.map(fireDate).filter(t => t !== null);
     if (allTimes.length > 1) {
       const minT = Math.min(...allTimes);
@@ -493,7 +496,7 @@
       const slider = $('dr-slider');
       const valueEl = $('dr-value');
       const resetBtn = $('dr-reset');
-      dr.hidden = false; // only reveal the control once there's a real range to filter
+      dr.hidden = false;
 
       const fmt = (t) => new Date(t).toLocaleDateString(undefined,
         { month: 'short', day: 'numeric' });
