@@ -1,0 +1,65 @@
+﻿name: Daily Wildfire Update
+
+on:
+  schedule:
+    - cron: '0 13 * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'python/**'
+      - 'requirements.txt'
+      - '.github/workflows/update_wildfire_map.yml'
+
+concurrency:
+  group: wildfire-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install system deps (GDAL for geopandas)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libgdal-dev gdal-bin
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch RFPA boundaries (one-time, if missing)
+        if: hashFiles('data/rfpa_boundaries.geojson') == ''
+        run: python python/fetch_rfpa.py
+        continue-on-error: true
+
+      - name: Fetch fresh perimeters
+        run: python python/fetch_fires.py
+
+      - name: Build map + summary
+        run: python python/build_ytd_map.py
+
+      - name: Commit outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A output/ data/ || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: daily wildfire update ($(date -u +%Y-%m-%d))"
+            git push
+          fi
