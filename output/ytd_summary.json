@@ -1,34 +1,34 @@
 {
-  "n_total": 1092,
-  "n_active": 938,
-  "n_contained": 154,
-  "total_acres": 3629742.6,
+  "n_total": 1098,
+  "n_active": 942,
+  "n_contained": 156,
+  "total_acres": 3638069.4,
   "median_dist": 10.9,
   "n_over_50": 107,
-  "pct_over_50": 9.8,
+  "pct_over_50": 9.7,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 484,
-      "n_active": 437,
-      "total_acres": 881816.8,
+      "n_fires": 489,
+      "n_active": 442,
+      "total_acres": 881725.5,
       "median_dist": 8.1,
       "pct_over_50": 1.0
     },
     {
       "state": "Oregon",
-      "n_fires": 325,
+      "n_fires": 326,
       "n_active": 265,
-      "total_acres": 2415411.8,
+      "total_acres": 2416460.9,
       "median_dist": 25.6,
-      "pct_over_50": 31.1
+      "pct_over_50": 31.0
     },
     {
       "state": "California",
       "n_fires": 283,
-      "n_active": 236,
-      "total_acres": 332514.0,
+      "n_active": 235,
+      "total_acres": 339883.0,
       "median_dist": 7.9,
       "pct_over_50": 0.4
     }
@@ -37,7 +37,7 @@
     {
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
       "n_fires": 42,
-      "n_active": 28,
+      "n_active": 27,
       "total_acres": 229107.2,
       "mean_dist": 59.4,
       "max_dist": 140.2,
@@ -47,7 +47,7 @@
       "nearest_station_name": "La Grande Fire House",
       "n_fires": 30,
       "n_active": 28,
-      "total_acres": 79577.6,
+      "total_acres": 80141.6,
       "mean_dist": 56.3,
       "max_dist": 129.5,
       "states": "Oregon"
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.0,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-08-30T17:09:37+00:00"
+  "generated_at": "2026-08-31T19:22:10+00:00"
 }
