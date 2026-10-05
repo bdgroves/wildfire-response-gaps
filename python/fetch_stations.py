@@ -140,6 +140,20 @@ def main() -> int:
 
     rows = dedupe_by_location(rows)
     log(f"After dedupe: {len(rows)} stations", prefix="stations")
+
+    # Overpass sometimes answers "successfully" with nothing (on 2026-09-01 it
+    # returned zero stations and the empty list broke the daily map for a
+    # month). Keep the old list unless the new one is a plausible size.
+    prev = []
+    if args.out.exists():
+        try:
+            prev = json.loads(args.out.read_text())
+        except ValueError:
+            prev = []
+    if len(rows) < max(100, 0.8 * len(prev)):
+        log(f"Only {len(rows)} stations vs {len(prev)} on file; keeping the old list",
+            prefix="stations")
+        return 1
     write_atomic(rows, args.out)
     log(f"Wrote {args.out}", prefix="stations")
     return 0
