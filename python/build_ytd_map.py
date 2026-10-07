@@ -15,6 +15,7 @@ Writes:
 from __future__ import annotations
 
 import argparse
+import textwrap
 import json
 import sys
 from datetime import datetime
@@ -384,7 +385,9 @@ def draw_subtitle(ax, stats: dict) -> None:
             f"{r['or_gap_in_rfpa']} ({r['or_gap_in_rfpa_pct']}%) "
             f"fall within Rangeland Fire Protection Association volunteer coverage."
         )
-    ax.text(0.02, 0.5, "".join(parts), fontsize=11, color=INK_BROWN, va="center")
+    # Wrapped so the long line can't run past the right edge (bbox_inches="tight"
+    # would otherwise widen the whole figure to fit it, leaving a blank strip).
+    ax.text(0.02, 0.5, textwrap.fill("".join(parts), 150), fontsize=11, color=INK_BROWN, va="center", linespacing=1.4)
 
 
 def draw_legend_strip(ax, has_rfpa: bool = False) -> None:
@@ -630,7 +633,7 @@ def draw_main_map(
     texts = []
     for _, row in label_fires.iterrows():
         pt = row.geometry.representative_point()
-        active_tag = "  â€¢  ACTIVE" if row["is_active"] else ""
+        active_tag = "  \u2022  ACTIVE" if row["is_active"] else ""
         text = f"{str(row['incident_name']).upper()}\n{format_acres(row['acres'])} ac{active_tag}"
         color = FIRE_ACTIVE if row["is_active"] else INK_BROWN
         t = ax.text(pt.x, pt.y, text, fontsize=6.5, weight="bold", color=color,
