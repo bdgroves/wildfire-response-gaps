@@ -61,5 +61,8 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "chore: daily wildfire update ($(date -u +%Y-%m-%d))"
+            # Someone may have pushed while this ran (an edit, the monthly
+            # station refresh); rebase onto it rather than fail the push.
+            git pull --rebase origin main
             git push
           fi
