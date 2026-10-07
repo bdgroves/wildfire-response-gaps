@@ -1,28 +1,28 @@
 {
-  "n_total": 1359,
-  "n_active": 1175,
+  "n_total": 1361,
+  "n_active": 1177,
   "n_contained": 184,
-  "total_acres": 3664433.3,
+  "total_acres": 3664434.2,
   "median_dist": 10.9,
   "n_over_50": 119,
-  "pct_over_50": 8.8,
+  "pct_over_50": 8.7,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 592,
-      "n_active": 540,
-      "total_acres": 912848.4,
+      "n_fires": 593,
+      "n_active": 541,
+      "total_acres": 912848.5,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
     {
       "state": "Oregon",
-      "n_fires": 449,
-      "n_active": 369,
-      "total_acres": 2383010.7,
-      "median_dist": 20.8,
-      "pct_over_50": 25.2
+      "n_fires": 450,
+      "n_active": 370,
+      "total_acres": 2383011.5,
+      "median_dist": 20.9,
+      "pct_over_50": 25.1
     },
     {
       "state": "California",
@@ -63,10 +63,10 @@
     },
     {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
-      "n_fires": 27,
-      "n_active": 26,
-      "total_acres": 6758.2,
-      "mean_dist": 14.9,
+      "n_fires": 28,
+      "n_active": 27,
+      "total_acres": 6758.3,
+      "mean_dist": 15.0,
       "max_dist": 33.3,
       "states": "Washington"
     },
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.2,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-07T15:31:14+00:00"
+  "generated_at": "2026-10-07T19:11:42+00:00"
 }
