@@ -1,34 +1,34 @@
 {
-  "n_total": 1392,
-  "n_active": 1207,
-  "n_contained": 185,
-  "total_acres": 3666786.4,
+  "n_total": 1401,
+  "n_active": 1215,
+  "n_contained": 186,
+  "total_acres": 3668401.0,
   "median_dist": 10.9,
-  "n_over_50": 128,
+  "n_over_50": 129,
   "pct_over_50": 9.2,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 604,
-      "n_active": 550,
-      "total_acres": 912512.4,
+      "n_fires": 606,
+      "n_active": 551,
+      "total_acres": 913073.6,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
     {
       "state": "Oregon",
-      "n_fires": 470,
-      "n_active": 390,
-      "total_acres": 2383029.0,
-      "median_dist": 21.3,
-      "pct_over_50": 26.0
+      "n_fires": 477,
+      "n_active": 397,
+      "total_acres": 2384099.4,
+      "median_dist": 21.0,
+      "pct_over_50": 25.8
     },
     {
       "state": "California",
       "n_fires": 318,
       "n_active": 267,
-      "total_acres": 371245.0,
+      "total_acres": 371228.0,
       "median_dist": 8.3,
       "pct_over_50": 0.3
     }
@@ -45,10 +45,10 @@
     },
     {
       "nearest_station_name": "La Grande Fire House",
-      "n_fires": 32,
-      "n_active": 26,
-      "total_acres": 84317.0,
-      "mean_dist": 58.3,
+      "n_fires": 36,
+      "n_active": 30,
+      "total_acres": 85387.0,
+      "mean_dist": 55.4,
       "max_dist": 129.5,
       "states": "Oregon"
     },
@@ -63,10 +63,10 @@
     },
     {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
-      "n_fires": 28,
-      "n_active": 27,
-      "total_acres": 6758.3,
-      "mean_dist": 15.0,
+      "n_fires": 29,
+      "n_active": 28,
+      "total_acres": 6758.4,
+      "mean_dist": 14.7,
       "max_dist": 33.3,
       "states": "Washington"
     },
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 122,
-    "or_gap_in_rfpa": 120,
+    "or_gap_fires": 123,
+    "or_gap_in_rfpa": 121,
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-11T17:53:47+00:00"
+  "generated_at": "2026-10-12T21:31:57+00:00"
 }
