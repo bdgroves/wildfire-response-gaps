@@ -1,8 +1,8 @@
 {
-  "n_total": 1421,
-  "n_active": 1230,
-  "n_contained": 191,
-  "total_acres": 3653399.0,
+  "n_total": 1424,
+  "n_active": 1234,
+  "n_contained": 190,
+  "total_acres": 3653456.0,
   "median_dist": 10.9,
   "n_over_50": 129,
   "pct_over_50": 9.1,
@@ -10,9 +10,9 @@
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 612,
-      "n_active": 555,
-      "total_acres": 913664.4,
+      "n_fires": 614,
+      "n_active": 557,
+      "total_acres": 913667.5,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
@@ -20,15 +20,15 @@
       "state": "Oregon",
       "n_fires": 482,
       "n_active": 402,
-      "total_acres": 2362122.2,
+      "total_acres": 2362122.4,
       "median_dist": 21.2,
       "pct_over_50": 25.5
     },
     {
       "state": "California",
-      "n_fires": 327,
-      "n_active": 273,
-      "total_acres": 377612.4,
+      "n_fires": 328,
+      "n_active": 275,
+      "total_acres": 377666.1,
       "median_dist": 8.2,
       "pct_over_50": 0.3
     }
@@ -72,10 +72,10 @@
     },
     {
       "nearest_station_name": "Arden Fire Station",
-      "n_fires": 27,
-      "n_active": 26,
-      "total_acres": 4566.8,
-      "mean_dist": 18.8,
+      "n_fires": 28,
+      "n_active": 27,
+      "total_acres": 4569.8,
+      "mean_dist": 18.6,
       "max_dist": 40.7,
       "states": "Washington"
     }
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-20T17:44:53+00:00"
+  "generated_at": "2026-10-21T17:51:19+00:00"
 }
