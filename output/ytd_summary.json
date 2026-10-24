@@ -1,8 +1,8 @@
 {
-  "n_total": 1428,
-  "n_active": 1237,
-  "n_contained": 191,
-  "total_acres": 3652958.5,
+  "n_total": 1432,
+  "n_active": 1239,
+  "n_contained": 193,
+  "total_acres": 3649918.2,
   "median_dist": 10.9,
   "n_over_50": 129,
   "pct_over_50": 9.0,
@@ -10,9 +10,9 @@
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 616,
-      "n_active": 559,
-      "total_acres": 913669.9,
+      "n_fires": 618,
+      "n_active": 560,
+      "total_acres": 913671.4,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
@@ -20,16 +20,16 @@
       "state": "Oregon",
       "n_fires": 482,
       "n_active": 402,
-      "total_acres": 2362122.4,
+      "total_acres": 2362325.0,
       "median_dist": 21.2,
       "pct_over_50": 25.5
     },
     {
       "state": "California",
-      "n_fires": 330,
-      "n_active": 276,
-      "total_acres": 377166.2,
-      "median_dist": 8.1,
+      "n_fires": 332,
+      "n_active": 277,
+      "total_acres": 373921.8,
+      "median_dist": 8.0,
       "pct_over_50": 0.3
     }
   ],
@@ -47,7 +47,7 @@
       "nearest_station_name": "La Grande Fire House",
       "n_fires": 36,
       "n_active": 30,
-      "total_acres": 85387.0,
+      "total_acres": 85589.6,
       "mean_dist": 55.4,
       "max_dist": 129.5,
       "states": "Oregon"
@@ -63,19 +63,19 @@
     },
     {
       "nearest_station_name": "Stevens County Fire & Rescue Station 2",
-      "n_fires": 29,
-      "n_active": 28,
-      "total_acres": 6758.4,
-      "mean_dist": 14.7,
+      "n_fires": 30,
+      "n_active": 29,
+      "total_acres": 6758.5,
+      "mean_dist": 14.4,
       "max_dist": 33.3,
       "states": "Washington"
     },
     {
       "nearest_station_name": "Arden Fire Station",
-      "n_fires": 28,
-      "n_active": 27,
-      "total_acres": 4569.8,
-      "mean_dist": 18.6,
+      "n_fires": 29,
+      "n_active": 28,
+      "total_acres": 4571.2,
+      "mean_dist": 19.3,
       "max_dist": 40.7,
       "states": "Washington"
     }
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-22T17:50:34+00:00"
+  "generated_at": "2026-10-24T16:26:05+00:00"
 }
