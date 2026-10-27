@@ -1,11 +1,11 @@
 {
   "n_total": 1435,
-  "n_active": 1242,
-  "n_contained": 193,
+  "n_active": 1239,
+  "n_contained": 196,
   "total_acres": 3649918.3,
   "median_dist": 10.9,
-  "n_over_50": 129,
-  "pct_over_50": 9.0,
+  "n_over_50": 128,
+  "pct_over_50": 8.9,
   "season_stage": "peak",
   "by_state": [
     {
@@ -19,10 +19,10 @@
     {
       "state": "Oregon",
       "n_fires": 482,
-      "n_active": 402,
+      "n_active": 399,
       "total_acres": 2362324.8,
-      "median_dist": 21.2,
-      "pct_over_50": 25.5
+      "median_dist": 21.0,
+      "pct_over_50": 25.3
     },
     {
       "state": "California",
@@ -55,7 +55,7 @@
     {
       "nearest_station_name": "Frenchglen Fire Guard Station",
       "n_fires": 32,
-      "n_active": 23,
+      "n_active": 20,
       "total_acres": 277821.4,
       "mean_dist": 64.9,
       "max_dist": 137.8,
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 123,
-    "or_gap_in_rfpa": 121,
+    "or_gap_fires": 122,
+    "or_gap_in_rfpa": 120,
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-26T19:00:43+00:00"
+  "generated_at": "2026-10-27T18:34:25+00:00"
 }
