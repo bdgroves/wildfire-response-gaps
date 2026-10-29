@@ -1,35 +1,35 @@
 {
-  "n_total": 1438,
-  "n_active": 1244,
-  "n_contained": 194,
-  "total_acres": 3649956.5,
+  "n_total": 1444,
+  "n_active": 1251,
+  "n_contained": 193,
+  "total_acres": 3649963.5,
   "median_dist": 10.9,
-  "n_over_50": 128,
+  "n_over_50": 129,
   "pct_over_50": 8.9,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 622,
-      "n_active": 565,
-      "total_acres": 913684.5,
+      "n_fires": 621,
+      "n_active": 563,
+      "total_acres": 913686.5,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
     {
       "state": "Oregon",
-      "n_fires": 483,
-      "n_active": 400,
-      "total_acres": 2362350.2,
-      "median_dist": 21.0,
-      "pct_over_50": 25.3
+      "n_fires": 489,
+      "n_active": 408,
+      "total_acres": 2362355.2,
+      "median_dist": 20.9,
+      "pct_over_50": 25.2
     },
     {
       "state": "California",
-      "n_fires": 333,
-      "n_active": 279,
+      "n_fires": 334,
+      "n_active": 280,
       "total_acres": 373921.8,
-      "median_dist": 8.0,
+      "median_dist": 8.1,
       "pct_over_50": 0.3
     }
   ],
@@ -45,10 +45,10 @@
     },
     {
       "nearest_station_name": "La Grande Fire House",
-      "n_fires": 36,
-      "n_active": 30,
-      "total_acres": 85589.6,
-      "mean_dist": 55.4,
+      "n_fires": 37,
+      "n_active": 31,
+      "total_acres": 85589.7,
+      "mean_dist": 55.8,
       "max_dist": 129.5,
       "states": "Oregon"
     },
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 122,
-    "or_gap_in_rfpa": 120,
+    "or_gap_fires": 123,
+    "or_gap_in_rfpa": 121,
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-28T18:39:12+00:00"
+  "generated_at": "2026-10-29T18:47:09+00:00"
 }
