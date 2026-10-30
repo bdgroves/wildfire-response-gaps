@@ -2,7 +2,7 @@
   "n_total": 1444,
   "n_active": 1251,
   "n_contained": 193,
-  "total_acres": 3649963.5,
+  "total_acres": 3649994.5,
   "median_dist": 10.9,
   "n_over_50": 129,
   "pct_over_50": 8.9,
@@ -12,7 +12,7 @@
       "state": "Washington",
       "n_fires": 621,
       "n_active": 563,
-      "total_acres": 913686.5,
+      "total_acres": 913717.5,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-10-29T18:47:09+00:00"
+  "generated_at": "2026-10-30T18:23:20+00:00"
 }
