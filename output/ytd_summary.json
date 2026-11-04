@@ -1,35 +1,35 @@
 {
-  "n_total": 1453,
-  "n_active": 1259,
-  "n_contained": 194,
-  "total_acres": 3650028.4,
-  "median_dist": 10.8,
-  "n_over_50": 129,
+  "n_total": 1463,
+  "n_active": 1268,
+  "n_contained": 195,
+  "total_acres": 3650581.8,
+  "median_dist": 10.9,
+  "n_over_50": 130,
   "pct_over_50": 8.9,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 624,
-      "n_active": 567,
-      "total_acres": 913730.7,
+      "n_fires": 629,
+      "n_active": 572,
+      "total_acres": 913957.3,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
     {
       "state": "Oregon",
-      "n_fires": 489,
-      "n_active": 408,
-      "total_acres": 2362357.7,
-      "median_dist": 20.9,
+      "n_fires": 492,
+      "n_active": 411,
+      "total_acres": 2362394.7,
+      "median_dist": 21.0,
       "pct_over_50": 25.2
     },
     {
       "state": "California",
-      "n_fires": 340,
-      "n_active": 284,
-      "total_acres": 373940.0,
-      "median_dist": 8.0,
+      "n_fires": 342,
+      "n_active": 285,
+      "total_acres": 374229.7,
+      "median_dist": 8.1,
       "pct_over_50": 0.3
     }
   ],
@@ -82,10 +82,10 @@
   ],
   "rfpa": {
     "n_rfpa": 15,
-    "or_gap_fires": 123,
-    "or_gap_in_rfpa": 121,
+    "or_gap_fires": 124,
+    "or_gap_in_rfpa": 122,
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-11-03T19:56:52+00:00"
+  "generated_at": "2026-11-04T20:14:05+00:00"
 }
