@@ -1,8 +1,8 @@
 {
-  "n_total": 1466,
-  "n_active": 1271,
+  "n_total": 1465,
+  "n_active": 1270,
   "n_contained": 195,
-  "total_acres": 3650598.7,
+  "total_acres": 3650578.7,
   "median_dist": 10.8,
   "n_over_50": 130,
   "pct_over_50": 8.9,
@@ -18,11 +18,11 @@
     },
     {
       "state": "Oregon",
-      "n_fires": 492,
-      "n_active": 411,
-      "total_acres": 2362394.7,
-      "median_dist": 21.0,
-      "pct_over_50": 25.2
+      "n_fires": 491,
+      "n_active": 410,
+      "total_acres": 2362374.7,
+      "median_dist": 20.9,
+      "pct_over_50": 25.3
     },
     {
       "state": "California",
@@ -36,10 +36,10 @@
   "top_stations": [
     {
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
-      "n_fires": 47,
-      "n_active": 30,
-      "total_acres": 185513.2,
-      "mean_dist": 63.8,
+      "n_fires": 46,
+      "n_active": 29,
+      "total_acres": 185493.2,
+      "mean_dist": 64.8,
       "max_dist": 140.2,
       "states": "Oregon"
     },
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-11-05T20:27:51+00:00"
+  "generated_at": "2026-11-06T19:50:11+00:00"
 }
