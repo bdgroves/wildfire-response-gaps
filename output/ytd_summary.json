@@ -1,7 +1,7 @@
 {
   "n_total": 1473,
-  "n_active": 1282,
-  "n_contained": 191,
+  "n_active": 1281,
+  "n_contained": 192,
   "total_acres": 3651160.1,
   "median_dist": 10.9,
   "n_over_50": 131,
@@ -19,7 +19,7 @@
     {
       "state": "Oregon",
       "n_fires": 493,
-      "n_active": 412,
+      "n_active": 411,
       "total_acres": 2362620.9,
       "median_dist": 21.0,
       "pct_over_50": 25.4
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-11-14T18:38:38+00:00"
+  "generated_at": "2026-11-15T19:14:09+00:00"
 }
