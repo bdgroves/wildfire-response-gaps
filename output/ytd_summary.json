@@ -1,35 +1,35 @@
 {
-  "n_total": 1487,
-  "n_active": 1301,
-  "n_contained": 186,
-  "total_acres": 3679089.9,
-  "median_dist": 10.9,
+  "n_total": 1493,
+  "n_active": 1308,
+  "n_contained": 185,
+  "total_acres": 3679638.8,
+  "median_dist": 10.8,
   "n_over_50": 132,
-  "pct_over_50": 8.9,
+  "pct_over_50": 8.8,
   "season_stage": "peak",
   "by_state": [
     {
       "state": "Washington",
-      "n_fires": 633,
-      "n_active": 576,
-      "total_acres": 913986.3,
+      "n_fires": 634,
+      "n_active": 577,
+      "total_acres": 914010.9,
       "median_dist": 8.3,
       "pct_over_50": 0.8
     },
     {
       "state": "Oregon",
-      "n_fires": 495,
-      "n_active": 420,
-      "total_acres": 2386066.9,
-      "median_dist": 21.1,
-      "pct_over_50": 25.5
+      "n_fires": 496,
+      "n_active": 421,
+      "total_acres": 2386093.3,
+      "median_dist": 21.0,
+      "pct_over_50": 25.4
     },
     {
       "state": "California",
-      "n_fires": 359,
-      "n_active": 305,
-      "total_acres": 379036.7,
-      "median_dist": 8.0,
+      "n_fires": 363,
+      "n_active": 310,
+      "total_acres": 379534.5,
+      "median_dist": 8.2,
       "pct_over_50": 0.3
     }
   ],
@@ -38,7 +38,7 @@
       "nearest_station_name": "City of Antelope Fire Department Fire Station",
       "n_fires": 47,
       "n_active": 34,
-      "total_acres": 186266.8,
+      "total_acres": 186267.2,
       "mean_dist": 64.4,
       "max_dist": 140.2,
       "states": "Oregon"
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-11-19T21:09:13+00:00"
+  "generated_at": "2026-11-20T20:54:07+00:00"
 }
