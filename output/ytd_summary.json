@@ -2,7 +2,7 @@
   "n_total": 1516,
   "n_active": 1330,
   "n_contained": 186,
-  "total_acres": 3677239.0,
+  "total_acres": 3677240.0,
   "median_dist": 10.6,
   "n_over_50": 133,
   "pct_over_50": 8.8,
@@ -28,7 +28,7 @@
       "state": "California",
       "n_fires": 377,
       "n_active": 324,
-      "total_acres": 379568.5,
+      "total_acres": 379569.5,
       "median_dist": 7.7,
       "pct_over_50": 0.3
     }
@@ -87,5 +87,5 @@
     "or_gap_in_rfpa_pct": 98.4,
     "total_acres_covered": 38730452.0
   },
-  "generated_at": "2026-11-26T22:05:47+00:00"
+  "generated_at": "2026-11-27T21:47:44+00:00"
 }
